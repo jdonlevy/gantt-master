@@ -1,0 +1,6303 @@
+@import url('https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap');
+
+:root {
+  color-scheme: light;
+  --bg: #f4f6fb;
+  --bg-gradient: radial-gradient(circle at top, #ffffff 0%, #f4f6fb 45%, #eef1f7 100%);
+  --panel: #ffffff;
+  --panel-soft: #f7f9fc;
+  --text: #0f172a;
+  --muted: #64748b;
+  --border: #e2e8f0;
+  --primary: #2563eb;
+  --primary-strong: #1e40af;
+  --accent: #f97316;
+  --success: #22c55e;
+  --status-not-started: #94a3b8;
+  --status-in-progress: #22c55e;
+  --status-completed: #2563eb;
+  --status-at-risk: #f59e0b;
+  --status-overdue: #ef4444;
+  /* UAT diamond → yellow, Live diamond → green. Chosen to map to the
+     natural "caution → go" mental model: UAT is a pending gate, live is
+     the successful ship. Pure hues (not ambers/teals) keep both legible
+     against the blue fix-version bars. */
+  --marker-uat: #eab308;
+  --marker-live: #16a34a;
+  --marker-milestone: #db2777;
+  --shadow: 0 12px 30px rgba(15, 23, 42, 0.08);
+  --shadow-soft: 0 8px 18px rgba(15, 23, 42, 0.08);
+  --focus-ring: rgba(37, 99, 235, 0.35);
+  --fix-not-started: #94a3b8;
+  --gantt-progress-width: 130px;
+}
+
+body[data-theme='dark'] {
+  color-scheme: dark;
+  --bg: #0b1120;
+  --bg-gradient: radial-gradient(circle at top, #1f2937 0%, #0b1120 45%, #070b16 100%);
+  --panel: #111827;
+  --panel-soft: #0f172a;
+  --text: #f8fafc;
+  --muted: #94a3b8;
+  --border: #1f2937;
+  --primary: #60a5fa;
+  --primary-strong: #93c5fd;
+  --accent: #fb923c;
+  --success: #34d399;
+  --status-not-started: #94a3b8;
+  --status-in-progress: #34d399;
+  --status-completed: #60a5fa;
+  --status-at-risk: #fbbf24;
+  --status-overdue: #f87171;
+  /* Dark-mode UAT / Live — brighter yellow + green so the diamonds still
+     pop against the deep panel background. */
+  --marker-uat: #facc15;
+  --marker-live: #4ade80;
+  --marker-milestone: #f472b6;
+  --shadow: 0 14px 30px rgba(2, 6, 23, 0.45);
+  --shadow-soft: 0 10px 20px rgba(2, 6, 23, 0.35);
+  --focus-ring: rgba(96, 165, 250, 0.4);
+  --fix-not-started: #94a3b8;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: Manrope, system-ui, sans-serif;
+  background: var(--bg-gradient);
+  color: var(--text);
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+}
+
+.app a {
+  color: var(--primary);
+  text-decoration: none;
+}
+
+.app a:hover {
+  text-decoration: underline;
+}
+
+.app a:focus-visible {
+  outline: 2px solid var(--focus-ring);
+  outline-offset: 2px;
+  border-radius: 8px;
+}
+
+.app {
+  max-width: 1240px;
+  margin: 0 auto;
+  padding: 40px 24px 80px;
+}
+
+header {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  margin-bottom: 28px;
+}
+
+.header-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.header-title {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+}
+
+.home-link {
+  width: 36px;
+  height: 36px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 12px;
+  border: 1px solid var(--border);
+  background: var(--panel);
+  color: var(--text);
+  text-decoration: none;
+  transition: border-color 0.2s ease, color 0.2s ease, transform 0.2s ease;
+}
+
+.home-link:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+  transform: translateY(-1px);
+}
+
+.home-link svg {
+  width: 18px;
+  height: 18px;
+}
+
+.header-actions {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.header-nav {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+h1 {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 32px;
+  margin: 0 0 6px;
+}
+
+p {
+  margin: 0;
+  color: var(--muted);
+}
+
+.muted {
+  color: var(--muted);
+}
+
+.card {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  padding: 20px 22px;
+  box-shadow: var(--shadow);
+  --collapsed-card-height: 56px;
+}
+
+.card.error {
+  border-color: rgba(239, 68, 68, 0.5);
+  color: #dc2626;
+}
+
+.controls {
+  display: flex;
+  gap: 14px;
+  flex-wrap: wrap;
+}
+
+label {
+  font-size: 12px;
+  color: var(--muted);
+  letter-spacing: 0.01em;
+  font-weight: 600;
+}
+
+.dashboard-tabs {
+  display: flex;
+  gap: 4px;
+  align-items: center;
+  border-bottom: 1px solid var(--border);
+  margin-bottom: 16px;
+}
+
+.dashboard-tab {
+  appearance: none;
+  border: none;
+  background: none;
+  cursor: pointer;
+  font: inherit;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--muted);
+  padding: 10px 16px;
+  border-radius: 8px 8px 0 0;
+  border-bottom: 2px solid transparent;
+  margin-bottom: -1px;
+  transition: color 0.15s ease, background 0.15s ease, border-color 0.15s ease;
+}
+
+.dashboard-tab:hover {
+  color: var(--text);
+  background: var(--panel-soft);
+}
+
+.dashboard-tab.is-active {
+  color: var(--text);
+  border-bottom-color: var(--primary);
+}
+
+/* Tab-appropriate focus ring: contained to the tab's rounded top so it
+   doesn't render as a floating box that clashes with the underline style. */
+.dashboard-tab:focus-visible {
+  outline: none;
+  box-shadow: inset 0 0 0 2px var(--focus-ring);
+}
+
+.filters-bar {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 14px 18px;
+}
+
+.filters-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-weight: 600;
+  color: var(--text);
+  gap: 12px;
+}
+
+.filters-title {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.filters-status {
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--muted);
+}
+
+.filters-status--dirty {
+  color: #fbbf24;
+}
+
+.filters-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.filters-grid {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  flex-wrap: wrap;
+}
+
+.filters-bar--collapsed {
+  padding: 0 16px;
+  min-height: var(--collapsed-card-height);
+  height: var(--collapsed-card-height);
+  display: flex;
+  align-items: center;
+}
+
+.filters-bar--collapsed .filters-header {
+  font-size: 13px;
+  min-height: 28px;
+  width: 100%;
+  height: 100%;
+  align-items: center;
+}
+
+.filters-bar--collapsed .filters-header button {
+  padding: 4px 10px;
+  font-size: 12px;
+}
+
+.filters-bar--collapsed .filters-status {
+  display: none;
+}
+
+.filter-group {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.filter-group--stacked {
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 6px;
+}
+
+/* Compact trigger for editors where the selection is shown elsewhere (e.g. the
+   lane fix-version pills) — the dropdown only needs to fit "N selected". */
+.filter-group--compact .filter-trigger {
+  min-width: 0;
+}
+
+/* Keeps the two Updates date inputs ("Date from" / "Date to") together as a
+   single flex item so they wrap as a pair rather than onto separate rows. */
+.update-date-range {
+  gap: 18px;
+}
+
+.toggle-group {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 2px;
+  border-radius: 999px;
+  border: 1px solid var(--border);
+  background: var(--panel-soft);
+}
+
+.toggle-pill {
+  border: none;
+  background: transparent;
+  color: var(--muted);
+  padding: 6px 12px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.toggle-pill.is-active {
+  background: var(--panel);
+  color: var(--text);
+  box-shadow: 0 6px 12px rgba(15, 23, 42, 0.12);
+}
+
+.toggle-pill.is-disabled,
+.toggle-pill:disabled {
+  cursor: not-allowed;
+  opacity: 0.55;
+  box-shadow: none;
+}
+
+.swimlane-editor {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  border-top: 1px solid var(--border);
+  padding-top: 12px;
+}
+
+.swimlane-editor-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.swimlane-title {
+  font-weight: 600;
+}
+
+.swimlane-subtitle {
+  display: block;
+  font-size: 12px;
+}
+
+.swimlane-editor-body {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.swimlane-editor-footer {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 12px;
+  margin-top: 12px;
+  padding-top: 12px;
+  border-top: 1px solid var(--border);
+}
+
+.swimlane-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  flex-wrap: wrap;
+  transition: opacity 0.12s ease;
+}
+
+.swimlane-reorder {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  /* Align the handle with the input fields, which sit below their labels. */
+  margin-top: 22px;
+}
+
+.swimlane-drag-handle {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 34px;
+  height: 34px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--panel-soft);
+  color: var(--muted);
+  font-size: 16px;
+  line-height: 1;
+  cursor: grab;
+  /* Without this, mousedown on the button's padding (not the glyph) starts a
+     text selection that competes with the drag — so the drag only fired when
+     grabbing directly over the dots. */
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+.swimlane-drag-handle:hover {
+  background: var(--panel);
+  border-color: var(--primary);
+  color: var(--text);
+}
+
+.swimlane-drag-handle:active {
+  cursor: grabbing;
+}
+
+.swimlane-row.is-dragging {
+  opacity: 0.5;
+}
+
+.swimlane-row.is-drag-over {
+  border-top: 2px solid var(--primary);
+  margin-top: -2px;
+}
+
+.swimlane-row.is-drag-over-below {
+  border-bottom: 2px solid var(--primary);
+  margin-bottom: -2px;
+}
+
+.swimlane-name {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.swimlane-name input {
+  min-width: 200px;
+  border-radius: 10px;
+  border: 1px solid var(--border);
+  background: var(--panel-soft);
+  padding: 8px 10px;
+  font-size: 13px;
+  color: var(--text);
+}
+
+.swimlane-remove {
+  align-self: flex-start;
+  margin-top: 20px;
+}
+
+.swimlane-empty {
+  font-size: 12px;
+  color: var(--muted);
+}
+
+.swimlane-filter-hint {
+  font-size: 12px;
+  color: var(--muted);
+  padding-top: 6px;
+}
+
+.initiative-editor-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.toggle-pill-checkbox {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+  color: var(--text);
+  cursor: pointer;
+}
+
+.initiative-colour {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.initiative-colour input[type='color'] {
+  width: 44px;
+  height: 36px;
+  padding: 2px;
+  border-radius: 10px;
+  border: 1px solid var(--border);
+  background: var(--panel-soft);
+  cursor: pointer;
+}
+
+/* ── Grouped swimlane editor (initiatives as coloured containers) ───────── */
+.lane-group {
+  border: 1px solid #cbd5e1;
+  border-radius: 12px;
+  background: var(--panel);
+  transition: opacity 0.12s ease;
+}
+
+.lane-group.is-dragging {
+  opacity: 0.5;
+}
+
+.lane-group.is-drag-over {
+  border-top: 2px solid var(--primary);
+}
+
+.lane-group.is-drag-over-below {
+  border-bottom: 2px solid var(--primary);
+}
+
+/* A lane is being dragged over this group — highlight it as the drop target. */
+.lane-group.is-lane-target {
+  border-color: var(--primary);
+  box-shadow: 0 0 0 1px var(--primary);
+}
+
+.lane-group.is-lane-target .lane-group-body {
+  background: rgba(37, 99, 235, 0.04);
+}
+
+.lane-group-head {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 12px;
+  cursor: grab;
+  background: var(--panel-soft);
+  border-bottom: 1px solid var(--border);
+  border-left: 4px solid var(--ini, #6366f1);
+  border-top-left-radius: 11px;
+  border-top-right-radius: 11px;
+}
+
+.lane-group-head:active {
+  cursor: grabbing;
+}
+
+/* Interactive controls inside the grabbable card/header keep their own cursor
+   so they don't inherit the grab affordance. */
+.lane-card-name,
+.lane-group-name {
+  cursor: text;
+}
+.lane-group-collapse,
+.colour-picker-swatch,
+.filter-trigger,
+.icon-btn {
+  cursor: pointer;
+}
+
+/* When a group is collapsed the head is the only visible element, so it
+   carries the full rounding. */
+.lane-group.is-collapsed .lane-group-head {
+  border-bottom: none;
+  border-radius: 11px;
+}
+
+.lane-group--ungrouped .lane-group-head {
+  border-left-color: var(--border);
+  background: repeating-linear-gradient(
+    45deg,
+    var(--panel-soft),
+    var(--panel-soft) 8px,
+    var(--bg) 8px,
+    var(--bg) 16px
+  );
+}
+
+.lane-group-collapse {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 30px;
+  height: 30px;
+  flex: 0 0 auto;
+  border: 1px solid transparent;
+  border-radius: 6px;
+  background: transparent;
+  color: var(--muted);
+  font-size: 18px;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.lane-group-collapse:hover {
+  border-color: var(--border);
+  background: var(--panel);
+  color: var(--text);
+}
+
+.colour-picker {
+  position: relative;
+  display: inline-flex;
+  flex: 0 0 auto;
+}
+
+.colour-picker-swatch {
+  width: 26px;
+  height: 26px;
+  padding: 0;
+  border-radius: 7px;
+  border: 1px solid rgba(0, 0, 0, 0.12);
+  cursor: pointer;
+}
+
+.colour-picker-popover {
+  position: absolute;
+  top: calc(100% + 6px);
+  left: 0;
+  z-index: 40;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 10px;
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  box-shadow: 0 8px 24px rgba(15, 23, 42, 0.12);
+}
+
+.colour-picker-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 6px;
+}
+
+.colour-picker-chip {
+  width: 26px;
+  height: 26px;
+  padding: 0;
+  border-radius: 6px;
+  border: 1px solid rgba(0, 0, 0, 0.12);
+  cursor: pointer;
+}
+
+.colour-picker-chip.is-selected {
+  outline: 2px solid var(--primary);
+  outline-offset: 1px;
+}
+
+.colour-picker-hex {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 12px;
+  color: var(--muted);
+}
+
+.colour-picker-hex input {
+  width: 90px;
+  border-radius: 7px;
+  border: 1px solid var(--border);
+  background: var(--panel-soft);
+  padding: 5px 8px;
+  font-size: 12px;
+  color: var(--text);
+  text-transform: uppercase;
+}
+
+
+.lane-group-name {
+  font-weight: 700;
+  font-size: 14px;
+  border: 1px solid transparent;
+  background: transparent;
+  color: var(--text);
+  padding: 4px 6px;
+  border-radius: 6px;
+  min-width: 160px;
+}
+
+.lane-group-name:hover,
+.lane-group-name:focus {
+  background: var(--panel);
+  border-color: var(--border);
+  outline: none;
+}
+
+.lane-group-count {
+  font-size: 11px;
+  color: var(--muted);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  white-space: nowrap;
+}
+
+.lane-group-head-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-left: auto;
+}
+
+.lane-group-body {
+  padding: 8px 10px 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.lane-group-empty {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+  font-size: 12px;
+  color: var(--muted);
+  padding: 4px 2px;
+}
+
+/* Removable variant of .lane-tag — used for fix-version pills in both the
+   swimlane lane cards and the non-swimlane initiative cards. Keeps the pill
+   look but adds an inline ✕ to deselect the fix version. */
+.lane-tag--removable {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding-right: 4px;
+}
+
+.lane-tag-remove {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 14px;
+  height: 14px;
+  padding: 0;
+  border: none;
+  border-radius: 999px;
+  background: transparent;
+  color: inherit;
+  font-size: 10px;
+  line-height: 1;
+  cursor: pointer;
+  opacity: 0.65;
+}
+
+.lane-tag-remove:hover {
+  opacity: 1;
+  background: rgba(55, 48, 163, 0.18);
+}
+
+.lane-card {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 10px;
+  border: 1px solid var(--border);
+  border-radius: 9px;
+  background: var(--panel-soft);
+  transition: opacity 0.12s ease;
+  cursor: grab;
+}
+
+.lane-card:active {
+  cursor: grabbing;
+}
+
+.lane-card:hover {
+  background: var(--panel);
+}
+
+.lane-card.is-dragging {
+  opacity: 0.5;
+}
+
+.lane-card.is-drag-over {
+  box-shadow: inset 0 2px 0 0 var(--primary);
+}
+
+.lane-card.is-drag-over-below {
+  box-shadow: inset 0 -2px 0 0 var(--primary);
+}
+
+.lane-card-name {
+  flex: 0 0 130px;
+  font-weight: 600;
+  font-size: 13px;
+  border: 1px solid transparent;
+  background: transparent;
+  color: var(--text);
+  padding: 4px 6px;
+  border-radius: 6px;
+}
+
+.lane-card-name:hover,
+.lane-card-name:focus {
+  background: var(--panel);
+  border-color: var(--border);
+  outline: none;
+}
+
+.lane-card-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+  flex: 1;
+  min-width: 0;
+}
+
+.lane-tag {
+  font-size: 11px;
+  padding: 3px 8px;
+  border-radius: 999px;
+  background: #eef2ff;
+  color: #3730a3;
+  border: 1px solid #e0e7ff;
+  white-space: nowrap;
+}
+
+.lane-tag--empty {
+  background: var(--panel);
+  color: var(--muted);
+  border-style: dashed;
+}
+
+.lane-tag--hidden {
+  background: var(--panel-soft);
+  color: var(--muted);
+  border-color: var(--border);
+}
+
+.lane-tag--loading {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: var(--panel-soft);
+  color: var(--muted);
+  border-color: var(--border);
+}
+
+.lane-card-actions {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex: 0 0 auto;
+}
+
+.icon-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 auto;
+  border: 1px solid var(--border);
+  background: var(--panel);
+  border-radius: 7px;
+  width: 28px;
+  height: 28px;
+  padding: 0;
+  cursor: pointer;
+  color: var(--muted);
+  font-size: 12px;
+  line-height: 1;
+}
+
+.icon-btn:hover {
+  color: var(--text);
+  border-color: var(--primary);
+}
+
+/* Stay neutral by default (overriding the global red `button.danger` fill) and
+   only flush red on hover so the ✕ buttons aren't visually shouty at rest. */
+.icon-btn.danger {
+  background: var(--panel);
+  color: var(--muted);
+  border-color: var(--border);
+}
+
+.icon-btn.danger:hover {
+  background: rgba(239, 68, 68, 0.1);
+  color: #dc2626;
+  border-color: #fca5a5;
+}
+
+.lane-add-row {
+  display: flex;
+  justify-content: center;
+  padding: 2px;
+}
+
+.lane-add-inline {
+  border: 1px dashed var(--border);
+  background: transparent;
+  color: var(--muted);
+  border-radius: 8px;
+  padding: 6px 12px;
+  font-size: 12px;
+  cursor: pointer;
+  width: 100%;
+}
+
+.lane-add-inline:hover {
+  border-color: var(--primary);
+  color: var(--primary);
+}
+
+.lane-group-empty .lane-add-inline {
+  width: auto;
+}
+
+.roadmap-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 10px;
+}
+
+.roadmap-empty h3 {
+  margin: 0;
+}
+
+.roadmap-empty p {
+  margin: 0;
+  color: var(--muted);
+  font-size: 13px;
+}
+
+.filter-label {
+  font-size: 12px;
+  color: var(--muted);
+  letter-spacing: 0.01em;
+  font-weight: 600;
+}
+
+.filter-select {
+  position: relative;
+}
+
+.filter-trigger {
+  min-width: 240px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  background: var(--panel-soft);
+  border: 1px solid var(--border);
+  color: var(--text);
+  padding: 8px 12px;
+  border-radius: 12px;
+  font-size: 13px;
+}
+
+.filter-trigger .chevron {
+  color: var(--muted);
+  font-size: 12px;
+}
+
+.filter-popover {
+  position: absolute;
+  top: calc(100% + 8px);
+  left: 0;
+  width: 320px;
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  box-shadow: var(--shadow-soft);
+  padding: 10px;
+  z-index: 10;
+}
+
+.filter-search input {
+  width: 100%;
+  padding: 8px 10px;
+  border-radius: 10px;
+}
+
+.filter-list {
+  max-height: 220px;
+  overflow-y: auto;
+  margin-top: 8px;
+  display: grid;
+  gap: 4px;
+}
+
+.filter-section-title {
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  color: var(--muted);
+  font-weight: 600;
+  padding: 4px 6px 2px;
+}
+
+.filter-loading {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 6px;
+  font-size: 13px;
+  color: var(--muted);
+}
+
+.filter-cap-hint {
+  margin-top: 8px;
+  padding: 6px 8px;
+  font-size: 12px;
+  color: var(--muted);
+  background: var(--panel-soft);
+  border-radius: 6px;
+}
+
+.filter-spinner {
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  border: 2px solid var(--border);
+  border-top-color: var(--primary);
+  animation: filter-spin 0.7s linear infinite;
+  flex: 0 0 auto;
+}
+
+@keyframes filter-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.filter-section-divider {
+  height: 1px;
+  background: var(--border);
+  margin: 4px 0;
+}
+
+.filter-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 8px;
+  border-radius: 10px;
+  font-size: 13px;
+  color: var(--text);
+}
+
+.filter-item:hover {
+  background: var(--panel-soft);
+}
+
+.filter-item.is-disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.filter-item.is-disabled:hover {
+  background: transparent;
+}
+
+.filter-disabled-note {
+  margin-left: auto;
+  padding-left: 8px;
+  font-size: 11px;
+  font-style: italic;
+  color: var(--muted);
+  white-space: nowrap;
+}
+
+.filter-key {
+  font-weight: 600;
+}
+
+.filter-name {
+  color: var(--muted);
+  font-size: 12px;
+}
+
+.filter-actions {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+  margin-top: 10px;
+}
+
+.dashboard-list-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 18px;
+  flex-wrap: wrap;
+}
+
+.dashboard-actions {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+}
+
+.dashboard-create {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.dashboard-create input {
+  padding: 8px 12px;
+  border-radius: 10px;
+  border: 1px solid var(--border);
+  background: var(--panel-soft);
+  color: var(--text);
+}
+
+.dashboard-search {
+  margin-bottom: 18px;
+}
+
+.dashboard-search input {
+  width: 100%;
+  padding: 10px 14px;
+  border-radius: 12px;
+  border: 1px solid var(--border);
+  background: var(--panel);
+  color: var(--text);
+}
+
+.dashboard-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 16px;
+}
+
+@media (max-width: 980px) {
+  .dashboard-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 640px) {
+  .dashboard-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+.dashboard-card {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: start;
+  gap: 12px;
+  padding: 16px;
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  text-decoration: none;
+  color: inherit;
+  box-shadow: var(--shadow);
+}
+
+.dashboard-card-link {
+  display: block;
+  min-width: 0;
+  gap: 12px;
+  text-decoration: none;
+  color: inherit;
+}
+
+
+.dashboard-delete {
+  padding: 6px 10px;
+  border-radius: 10px;
+  border: 1px solid rgba(239, 68, 68, 0.3);
+  background: rgba(239, 68, 68, 0.12);
+  color: #ef4444;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.dashboard-card h3 {
+  margin: 0 0 6px;
+  font-size: clamp(16px, 1.4vw, 18px);
+  line-height: 1.2;
+  overflow-wrap: anywhere;
+}
+
+.dashboard-card .muted {
+  font-size: clamp(12px, 1.1vw, 14px);
+}
+
+.dashboard-card-description {
+  margin: 0 0 8px;
+  font-size: 13px;
+  color: var(--muted);
+  line-height: 1.5;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.dashboard-card-updated {
+  font-size: 11px;
+  color: var(--muted);
+  opacity: 0.5;
+  letter-spacing: 0.01em;
+}
+
+/* ── Folder select (create bar) ── */
+.dashboard-create .folder-select {
+  padding: 8px 12px;
+  border-radius: 10px;
+  border: 1px solid var(--border);
+  background: var(--panel-soft);
+  color: var(--text);
+  cursor: pointer;
+  font-size: 14px;
+}
+
+/* ── Folder list ── */
+.folder-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.folder-list-label {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--muted);
+  padding: 0 4px 2px;
+}
+
+.folder-list-summary {
+  font-size: 11px;
+  font-weight: 400;
+  text-transform: none;
+  letter-spacing: 0;
+  color: var(--muted);
+  opacity: 0.6;
+}
+
+.folder-group {
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  /* overflow: hidden removed — dropdown menus inside must be able to escape */
+  position: relative;
+  transition: opacity 0.15s;
+}
+
+.folder-group--empty {
+  opacity: 0.45;
+}
+
+.folder-group--empty:hover {
+  opacity: 0.75;
+}
+
+.folder-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  padding: 13px 18px;
+  background: var(--panel-soft);
+  border: none;
+  border-radius: 14px;
+  color: var(--text);
+  cursor: pointer;
+  text-align: left;
+  font-family: inherit;
+  font-size: 14px;
+  font-weight: 600;
+  transition: background 0.15s;
+}
+
+.folder-group--open .folder-header {
+  border-radius: 14px 14px 0 0;
+}
+
+.folder-header:hover {
+  background: color-mix(in srgb, var(--panel-soft) 60%, var(--border) 40%);
+}
+
+.folder-chevron {
+  font-size: 18px;
+  color: var(--muted);
+  flex-shrink: 0;
+  width: 20px;
+  transition: color 0.15s;
+}
+
+.folder-header:hover .folder-chevron {
+  color: var(--text);
+}
+
+.folder-name {
+  flex: 1;
+}
+
+.folder-count {
+  background: var(--border);
+  color: var(--muted);
+  border-radius: 20px;
+  padding: 2px 10px;
+  font-size: 11px;
+  font-weight: 600;
+  transition: background 0.15s, color 0.15s;
+}
+
+.folder-count--active {
+  background: var(--primary);
+  color: #fff;
+}
+
+.folder-body {
+  padding: 14px;
+  background: var(--panel);
+  border-radius: 0 0 14px 14px;
+}
+
+.folder-empty {
+  font-size: 13px;
+  padding: 4px 2px;
+}
+
+/* Tiles inside open folders — 2-col, scaled down */
+.folder-body .dashboard-grid {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+}
+
+@media (max-width: 780px) {
+  .folder-body .dashboard-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+.folder-body .dashboard-card {
+  padding: 12px 16px;
+  border-radius: 12px;
+  box-shadow: none;
+  min-height: 80px;
+  align-items: start;
+}
+
+.folder-body .dashboard-card h3 {
+  font-size: 15px;
+  font-weight: 600;
+  margin: 0 0 5px;
+}
+
+/* ── Dashboard card ··· menu ── */
+.dashboard-card-meta {
+  position: relative;
+  display: flex;
+  align-items: flex-start;
+  padding-top: 2px;
+}
+
+.dashboard-menu-btn {
+  padding: 2px 8px;
+  font-size: 18px;
+  line-height: 1;
+  letter-spacing: 2px;
+  border-radius: 6px;
+  opacity: 0.5;
+  transition: opacity 0.15s;
+}
+.dashboard-card:hover .dashboard-menu-btn,
+.dashboard-menu-btn:focus {
+  opacity: 1;
+}
+
+.dashboard-card-menu {
+  position: absolute;
+  top: calc(100% + 4px);
+  right: 0;
+  z-index: 100;
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  box-shadow: var(--shadow);
+  min-width: 180px;
+  padding: 8px 0;
+}
+
+.dashboard-card-menu-section {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 6px 12px;
+}
+
+.dashboard-card-menu-label {
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--muted);
+}
+
+.folder-move-select {
+  padding: 5px 8px;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  background: var(--panel-soft);
+  color: var(--text);
+  font-size: 13px;
+  cursor: pointer;
+  width: 100%;
+  font-family: inherit;
+}
+
+.folder-move-select:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.dashboard-card-menu-divider {
+  margin: 6px 0;
+  border: none;
+  border-top: 1px solid color-mix(in srgb, var(--border) 100%, var(--text) 20%);
+}
+
+.dashboard-card-menu-action {
+  display: block;
+  width: calc(100% - 24px);
+  margin: 0 12px;
+  text-align: left;
+  padding: 6px 8px;
+  border-radius: 6px;
+  font-size: 13px;
+  background: none;
+  border: none;
+  color: var(--text);
+  cursor: pointer;
+}
+
+.dashboard-card-menu-action:hover:not(:disabled) {
+  background: var(--panel-soft);
+}
+
+.dashboard-card-menu-action:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.dashboard-card-menu-delete {
+  display: block;
+  width: calc(100% - 24px);
+  margin: 0 12px;
+  text-align: left;
+  padding: 6px 8px;
+  border-radius: 6px;
+  font-size: 13px;
+}
+
+/* Inline rename UI inside the card */
+.dashboard-card-rename {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 4px 0;
+}
+
+.dashboard-rename-input {
+  background: var(--panel-soft);
+  border: 1px solid var(--accent, #6366f1);
+  border-radius: 6px;
+  padding: 7px 10px;
+  color: var(--text);
+  font-size: 14px;
+  font-weight: 600;
+  outline: none;
+  width: 100%;
+}
+
+.dashboard-rename-actions {
+  display: flex;
+  gap: 6px;
+  justify-content: flex-end;
+}
+
+.dashboard-rename-actions button {
+  font-size: 12px;
+  padding: 4px 12px;
+}
+
+/* ── Confirm delete modal ── */
+.confirm-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0, 0, 0, 0.55);
+  backdrop-filter: blur(4px);
+  animation: fade-in 0.15s ease;
+}
+
+@keyframes fade-in {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+.confirm-dialog {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 18px;
+  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.35);
+  padding: 28px 28px 24px;
+  max-width: 400px;
+  width: calc(100% - 48px);
+  animation: slide-up 0.15s ease;
+}
+
+@keyframes slide-up {
+  from { opacity: 0; transform: translateY(12px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.confirm-dialog-title {
+  margin: 0 0 10px;
+  font-size: 18px;
+  font-weight: 700;
+}
+
+.confirm-dialog-body {
+  margin: 0 0 24px;
+  font-size: 14px;
+  color: var(--muted);
+  line-height: 1.6;
+}
+
+.confirm-dialog-body strong {
+  color: var(--text);
+  font-weight: 600;
+}
+
+.confirm-dialog-actions {
+  display: flex;
+  gap: 10px;
+  justify-content: flex-end;
+}
+
+.dashboard-title {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 0;
+  flex-wrap: wrap;
+}
+
+.dashboard-title-text {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.dashboard-description-input {
+  display: block;
+  width: 100%;
+  max-width: 560px;
+  box-sizing: border-box;
+  background: transparent;
+  border: 1px solid transparent;
+  border-radius: 8px;
+  color: var(--muted);
+  font-size: 13px;
+  font-family: inherit;
+  line-height: 1.5;
+  padding: 4px 8px;
+  resize: none;
+  outline: none;
+  transition: background 0.15s, border-color 0.15s, color 0.15s;
+  overflow: hidden;
+  /* Fallback height for browsers that don't support field-sizing (e.g. Firefox ≤152) */
+  min-height: 2.5rem;
+  field-sizing: content;
+}
+
+.dashboard-description-input::placeholder {
+  color: var(--muted);
+  opacity: 0.4;
+}
+
+.dashboard-description-input:hover {
+  border-color: var(--border);
+}
+
+.dashboard-description-input--focused {
+  border-color: var(--border);
+  background: var(--panel-soft);
+  color: var(--text);
+}
+
+.dashboard-description-static {
+  margin: 0;
+  font-size: 13px;
+  color: var(--muted);
+  line-height: 1.5;
+  max-width: 560px;
+}
+
+.dashboard-back {
+  align-self: flex-start;
+  padding: 6px 10px;
+  font-size: 12px;
+}
+
+.dashboard-page {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.dashboard-title-actions {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+
+.panel-width-control {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 10px;
+  border-radius: 10px;
+  border: 1px solid var(--border);
+  background: var(--panel);
+  font-size: 12px;
+  color: var(--text-muted);
+}
+
+.panel-width-select {
+  border: 1px solid var(--border);
+  background: var(--panel-soft);
+  color: var(--text);
+  border-radius: 8px;
+  padding: 4px 8px;
+  font-size: 12px;
+}
+
+.dashboard-panels {
+  display: grid;
+  grid-template-columns: repeat(12, minmax(0, 1fr));
+  grid-auto-rows: 56px;
+  gap: 16px;
+  margin-bottom: 0;
+}
+
+.dashboard-page[data-density='compact'] .dashboard-panels {
+  grid-auto-rows: 56px;
+  gap: 16px;
+}
+
+.dashboard-panels--placing {
+  cursor: crosshair;
+}
+
+.dashboard-panels--placing .dashboard-panel {
+  pointer-events: none;
+}
+
+.dashboard-panels--dragging {
+  cursor: grabbing;
+}
+
+.dashboard-panels--dragging .dashboard-panel {
+  pointer-events: none;
+}
+
+.panel-placement {
+  border: 2px dashed rgba(59, 130, 246, 0.5);
+  border-radius: 18px;
+  background: rgba(59, 130, 246, 0.08);
+  pointer-events: none;
+}
+
+.panel-placement.is-invalid {
+  border-color: rgba(239, 68, 68, 0.6);
+  background: rgba(239, 68, 68, 0.08);
+}
+
+button.panel-target {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px dashed rgba(59, 130, 246, 0.5);
+  border-radius: 14px;
+  background: rgba(59, 130, 246, 0.06);
+  color: var(--muted);
+  font-size: 11px;
+  font-weight: 600;
+  padding: 6px;
+  cursor: pointer;
+  position: relative;
+  z-index: 3;
+}
+
+button.panel-target:hover {
+  background: rgba(59, 130, 246, 0.12);
+  color: var(--text);
+}
+
+button.panel-target--below {
+  border-style: dashed;
+}
+
+.add-panel-card {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 10px;
+  border: 1px dashed rgba(148, 163, 184, 0.5);
+  background: rgba(15, 23, 42, 0.05);
+  color: var(--text);
+  border-radius: 18px;
+  padding: 18px;
+  margin-bottom: 32px;
+  transition: transform 0.2s ease, border-color 0.2s ease, background 0.2s ease;
+}
+
+.add-panel-card:hover {
+  transform: translateY(-2px);
+  border-color: rgba(148, 163, 184, 0.9);
+  background: rgba(59, 130, 246, 0.08);
+}
+
+.add-panel-card.is-disabled:hover {
+  transform: none;
+  border-color: rgba(148, 163, 184, 0.5);
+  background: rgba(15, 23, 42, 0.05);
+}
+
+.add-panel-title {
+  font-size: 15px;
+  font-weight: 600;
+}
+
+.add-panel-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.add-panel-hint {
+  font-size: 12px;
+  color: var(--muted);
+}
+
+.add-panel-controls {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+}
+
+.add-panel-card.is-disabled {
+  opacity: 0.6;
+}
+
+.panel-width-control--inline {
+  padding: 6px 10px;
+}
+
+button.ghost {
+  background: transparent;
+  color: var(--muted);
+  border: 1px solid var(--border);
+  padding: 8px 12px;
+}
+
+.dashboard-panel {
+  display: flex;
+  flex-direction: column;
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 18px;
+  box-shadow: var(--shadow);
+  overflow: visible;
+}
+
+.dashboard-panel--metrics {
+  height: fit-content;
+  align-self: start;
+}
+
+.dashboard-panel--collapsed {
+  justify-content: center;
+  min-height: var(--collapsed-card-height);
+  height: var(--collapsed-card-height);
+}
+
+.panel-header {
+  display: flex;
+  align-items: center;
+  padding: 12px 14px;
+  border-bottom: 1px solid var(--border);
+  background: var(--panel-soft);
+  font-weight: 600;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.panel-title-group {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex: 1;
+  min-width: 0;
+}
+
+.dashboard-page[data-density='compact'] .panel-header {
+  padding: 8px 10px;
+  font-size: 13px;
+}
+
+.dashboard-panel--collapsed .panel-header {
+  border-bottom: none;
+  align-items: center;
+  height: 100%;
+  padding: 0 16px;
+  min-height: var(--collapsed-card-height);
+}
+
+.panel-header input {
+  width: 100%;
+  border: none;
+  background: transparent;
+  font-weight: 600;
+  color: var(--text);
+  font-size: 14px;
+}
+
+.panel-drag {
+  padding: 4px 8px;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  background: var(--panel);
+  color: var(--muted);
+  font-size: 11px;
+  cursor: grab;
+  line-height: 1;
+}
+
+.panel-drag:active {
+  cursor: grabbing;
+}
+
+.dashboard-panel.is-dragging {
+  opacity: 0.55;
+}
+
+.dashboard-panel.is-drop-target {
+  outline: 2px dashed rgba(148, 163, 184, 0.7);
+  outline-offset: 4px;
+}
+
+.dashboard-panel.is-being-edited {
+  outline: 2px solid var(--presence-colour, #6366f1);
+  outline-offset: 2px;
+  box-shadow: 0 0 0 4px color-mix(in srgb, var(--presence-colour, #6366f1) 15%, transparent);
+}
+
+.panel-presence-badges {
+  display: flex;
+  gap: 4px;
+  align-items: center;
+  margin-left: auto;
+  padding-right: 4px;
+  flex-shrink: 0;
+}
+
+.panel-presence-avatar {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 10px;
+  font-weight: 700;
+  color: #fff;
+  overflow: hidden;
+  border: 2px solid var(--panel);
+  position: relative;
+  flex-shrink: 0;
+}
+
+.panel-presence-avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.panel-actions {
+  display: flex;
+  gap: 8px;
+  flex-shrink: 0;
+  align-items: center;
+  position: relative;
+}
+
+.panel-save {
+  background: var(--primary);
+  color: #fff;
+}
+
+.panel-save:disabled {
+  background: var(--panel-soft);
+  color: var(--muted);
+  border: 1px solid var(--border);
+  cursor: not-allowed;
+}
+
+.panel-actions .icon-button {
+  background: var(--panel-soft);
+  color: var(--text);
+  border: 1px solid var(--border);
+  padding: 6px 10px;
+  border-radius: 10px;
+  font-weight: 600;
+}
+
+.panel-menu-anchor {
+  position: relative;
+  display: inline-flex;
+}
+
+.panel-menu {
+  position: absolute;
+  top: calc(100% + 6px);
+  right: 0;
+  min-width: 140px;
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  box-shadow: var(--shadow-soft);
+  padding: 6px;
+  display: grid;
+  gap: 4px;
+  z-index: 5;
+}
+
+.panel-menu-section {
+  display: grid;
+  gap: 6px;
+  padding: 6px;
+  border-bottom: 1px solid var(--border);
+}
+
+.panel-menu-section:last-child {
+  border-bottom: none;
+}
+
+.panel-menu-label {
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  color: var(--muted);
+}
+
+.panel-width-select--menu {
+  width: 100%;
+}
+
+.panel-menu .panel-menu-item {
+  width: 100%;
+  text-align: left;
+  background: transparent;
+  border: none;
+  padding: 6px 8px;
+  color: var(--text);
+}
+
+.panel-menu .panel-menu-item:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.panel-menu .panel-menu-item:hover {
+  background: var(--panel-soft);
+}
+
+.panel-menu .panel-menu-item.danger {
+  color: #ef4444;
+}
+
+.dashboard-panel--collapsed .panel-actions button {
+  padding: 4px 10px;
+  font-size: 11px;
+}
+
+.dashboard-panel--collapsed .panel-header input,
+.dashboard-panel--collapsed .panel-header span {
+  font-size: 14px;
+}
+
+.panel-body {
+  flex: 1;
+  padding: 12px 14px;
+  height: auto;
+  overflow: visible;
+}
+
+.dashboard-page[data-density='compact'] .panel-body {
+  padding: 8px 10px;
+  font-size: 12px;
+}
+
+.panel-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 10px;
+  position: sticky;
+  top: 0;
+  z-index: 2;
+  background: var(--panel);
+  padding: 4px 0;
+  border: none;
+  min-inline-size: 0;
+}
+
+.panel-toolbar button {
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  background: var(--panel-soft);
+  color: var(--text);
+  padding: 4px 8px;
+  font-size: 12px;
+}
+
+.panel-toolbar--disabled {
+  opacity: 0.65;
+}
+
+.toolbar-trigger {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.toolbar-trigger.icon-trigger {
+  min-width: 36px;
+  justify-content: center;
+  font-weight: 700;
+}
+
+.toolbar-menu {
+  position: absolute;
+  top: 38px;
+  left: 0;
+  min-width: 180px;
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  box-shadow: var(--shadow-soft);
+  padding: 6px;
+  display: grid;
+  gap: 4px;
+  z-index: 5;
+}
+
+.toolbar-section {
+  display: grid;
+  gap: 6px;
+  padding: 6px;
+  border-bottom: 1px solid var(--border);
+}
+
+.toolbar-section:last-child {
+  border-bottom: none;
+}
+
+.toolbar-section-title {
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  color: var(--muted);
+}
+
+.toolbar-inline {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.toolbar-field {
+  display: grid;
+  gap: 4px;
+}
+
+.toolbar-field label {
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  color: var(--muted);
+}
+
+.color-row,
+.preset-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.toolbar-menu--icons {
+  min-width: auto;
+  grid-auto-flow: column;
+  grid-auto-columns: minmax(32px, 1fr);
+  padding: 6px;
+  gap: 6px;
+}
+
+.toolbar-menu button {
+  width: 100%;
+  justify-content: flex-start;
+  background: transparent;
+  border: none;
+  padding: 6px 8px;
+}
+
+.toolbar-menu .font-control {
+  gap: 6px;
+}
+
+.toolbar-menu .font-control .font-step {
+  width: auto;
+  background: var(--panel-soft);
+  border: 1px solid var(--border);
+  padding: 4px 6px;
+}
+
+.toolbar-menu .font-control .font-value {
+  background: var(--panel-soft);
+  border: 1px solid var(--border);
+}
+
+.toolbar-menu--icons button {
+  width: 32px;
+  justify-content: center;
+  text-align: center;
+  border-radius: 8px;
+  padding: 6px 0;
+}
+
+.toolbar-menu--icons .format-bold {
+  font-weight: 700;
+}
+
+.toolbar-menu--icons .format-italic {
+  font-style: italic;
+}
+
+.toolbar-menu--icons .format-underline {
+  text-decoration: underline;
+}
+
+.toolbar-menu--icons .format-strike {
+  text-decoration: line-through;
+}
+
+.toolbar-menu--icons .format-code {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono', 'Courier New', monospace;
+  font-size: 11px;
+}
+
+.toolbar-menu--icons .list-icon {
+  font-weight: 600;
+}
+
+.toolbar-menu button:hover {
+  background: var(--panel-soft);
+}
+
+.dashboard-page[data-density='compact'] .panel-toolbar button {
+  padding: 2px 6px;
+  font-size: 11px;
+}
+
+.panel-toolbar .primary {
+  background: var(--primary);
+  color: white;
+  border: none;
+}
+
+.panel-editor {
+  font-size: 14px;
+  overflow: visible;
+  /* Explicitly inherit the theme-aware text token so rich-text content
+     renders near-black in light mode. Without this, the editor fell back
+     to whatever its closest coloured ancestor was (commonly the inline
+     panel wrapper, which used a near-white grey). */
+  color: var(--text);
+}
+/* Force the theme-aware text colour on the editor and every descendant.
+   The universal selector is deliberate: pasted HTML (especially from
+   Jira) routinely ships with non-inheritable colour rules on <p>,
+   <span>, <li>, <strong>, etc. that would otherwise render as their
+   source-document greys instead of our --text. Inline styles still
+   win (specificity 1,0,0,0 > 0,2,1), which is what we want for
+   authored colour choices. We scope the rule tightly (both selectors
+   require .panel-editor .ProseMirror as an ancestor) so it can't
+   bleed into other parts of the app. */
+.panel-editor .ProseMirror,
+.panel-editor .ProseMirror * {
+  color: var(--text);
+}
+
+.panel-editor--editable {
+  background: rgba(15, 23, 42, 0.03);
+  border-radius: 12px;
+}
+
+/* TipTap's EditorContent renders a wrapper div between .panel-editor and the
+   contenteditable .ProseMirror — make every descendant fill the width so the
+   editable surface spans the full box (clicks anywhere land on ProseMirror). */
+.panel-editor > *,
+.panel-editor > * > * {
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.panel-editor .ProseMirror {
+  outline: none;
+  line-height: 1.5;
+  min-height: 120px;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.panel-editor--editable .ProseMirror {
+  padding: 10px;
+}
+
+.panel-editor img {
+  max-width: 100%;
+  border-radius: 12px;
+}
+
+/* ── Resizable image wrapper ──────────────────────────────────────────────
+   Used in both rich-text panels (via the custom TipTap ResizableImage
+   NodeView) and AI summary contentEditable paragraphs. The span provides
+   a native browser resize corner; the inner <img> fills the span. Width
+   and height are persisted as inline styles on the span so they survive
+   reloads. */
+/* Image wrapper: no resize, no user-controlled sizing. Image renders at
+   its natural size, capped to the container width. The wrapper exists so
+   we can anchor the remove-button overlay in the top-right corner. */
+.rsz-img {
+  display: inline-block;
+  max-width: 100%;
+  vertical-align: middle;
+  line-height: 0;
+  border-radius: 12px;
+  overflow: hidden;
+  position: relative;
+}
+
+.rsz-img > img {
+  max-width: 100%;
+  height: auto;
+  display: block;
+  cursor: zoom-in;
+  border-radius: 0;
+}
+
+/* Remove-image button: a small circular × sitting in the top-right corner
+   of the image wrapper. Visually hidden by default, revealed when the user
+   hovers or focuses the wrapper (so it doesn't clutter the normal reading
+   view). Uses opacity/visibility/pointer-events instead of display:none so
+   the button still exists in the tab order — keyboard users can tab to
+   the wrapper (which has tabindex="0"), hit Tab again to land on the
+   button, and trigger removal with Enter/Space.
+   Clicking removes the image from both rich-text panels and AI summary
+   contentEditables — see the handlers in tiptap/ResizableImage.ts (TipTap
+   NodeView) and components/ImageLightbox.tsx (global listener). */
+.rsz-img-remove {
+  position: absolute;
+  top: 6px;
+  right: 6px;
+  width: 22px;
+  height: 22px;
+  padding: 0;
+  margin: 0;
+  border: none;
+  border-radius: 50%;
+  background: rgba(0, 0, 0, 0.55);
+  color: #fff;
+  font-size: 14px;
+  line-height: 1;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  z-index: 2;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.25);
+  transition: background 0.12s ease, opacity 0.12s ease;
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+}
+
+.rsz-img:hover .rsz-img-remove,
+.rsz-img:focus-within .rsz-img-remove,
+.rsz-img-remove:focus,
+.rsz-img-remove:focus-visible {
+  opacity: 1;
+  visibility: visible;
+  pointer-events: auto;
+}
+
+/* Make the wrapper itself focusable so :focus-within fires for keyboard
+   users tabbing through content. The inner <img> is still click/zoom-able;
+   tabbing into the wrapper + another Tab lands on the remove button. */
+.rsz-img {
+  outline: none;
+}
+.rsz-img:focus-visible {
+  outline: 2px solid var(--focus-ring, #60a5fa);
+  outline-offset: 2px;
+}
+
+.rsz-img-remove:hover {
+  background: rgba(220, 38, 38, 0.9); /* red-600-ish */
+}
+.rsz-img-remove:focus-visible {
+  outline: 2px solid #fff;
+  outline-offset: 2px;
+}
+
+/* Bare images without the resize wrapper (older paste behaviour, or images
+   coming from Jira/web sources) still get a zoom-in cursor when they can
+   be enlarged by the lightbox. */
+.wu-section-summary img,
+.panel-editor img {
+  cursor: zoom-in;
+}
+
+/* ── Full-screen image lightbox ───────────────────────────────────────── */
+.image-lightbox {
+  position: fixed;
+  inset: 0;
+  background: rgba(15, 23, 42, 0.85);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+  cursor: zoom-out;
+  animation: image-lightbox-fade 120ms ease-out;
+}
+
+@keyframes image-lightbox-fade {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.image-lightbox__img {
+  max-width: 92vw;
+  max-height: 92vh;
+  object-fit: contain;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.6);
+  border-radius: 8px;
+  cursor: default;
+}
+
+.image-lightbox__close {
+  position: absolute;
+  top: 16px;
+  right: 20px;
+  background: rgba(255, 255, 255, 0.12);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  color: white;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  font-size: 22px;
+  line-height: 1;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.image-lightbox__close:hover {
+  background: rgba(255, 255, 255, 0.2);
+}
+
+.status-pill {
+  display: inline-flex;
+  align-items: center;
+  padding: 2px 8px;
+  border-radius: 999px;
+  font-size: 11px;
+  font-weight: 600;
+  margin: 0 4px;
+}
+
+.status-pill--done {
+  background: rgba(34, 197, 94, 0.2);
+  color: #16a34a;
+}
+
+.status-pill--in_progress {
+  background: rgba(249, 115, 22, 0.2);
+  color: #ea580c;
+}
+
+.status-pill--blocked {
+  background: rgba(239, 68, 68, 0.2);
+  color: #dc2626;
+}
+
+.toolbar-group {
+  display: inline-flex;
+  gap: 6px;
+  align-items: center;
+  position: relative;
+}
+
+/* Collapsible toolbar support */
+.panel-toolbar--collapsed > *:not(.toolbar-collapse-btn) {
+  display: none;
+}
+.panel-toolbar--collapsed {
+  flex-wrap: nowrap;
+}
+.toolbar-collapse-btn {
+  margin-left: auto;
+  font-size: 11px;
+  padding: 3px 8px !important;
+  opacity: 0.55;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+.toolbar-collapse-btn:hover {
+  opacity: 1;
+}
+
+.font-control {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.font-step {
+  padding: 4px 6px;
+  min-width: 24px;
+}
+
+.font-value {
+  min-width: 34px;
+  text-align: center;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  background: var(--panel-soft);
+  padding: 4px 6px;
+  font-size: 12px;
+}
+
+.dashboard-list .muted,
+.dashboard-page .muted {
+  color: var(--muted);
+}
+
+.date-input {
+  min-width: 150px;
+}
+
+.date-input--error {
+  border-color: #dc2626;
+  outline-color: #dc2626;
+}
+
+.date-range-error {
+  font-size: 11px;
+  color: #dc2626;
+  margin: 0;
+  align-self: center;
+}
+
+input, select, button, textarea {
+  font: inherit;
+}
+
+input, select, textarea {
+  padding: 10px 12px;
+  border-radius: 12px;
+  border: 1px solid var(--border);
+  background: var(--panel-soft);
+  color: var(--text);
+  transition: border-color 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
+}
+
+input:focus, select:focus, textarea:focus {
+  outline: none;
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px var(--focus-ring);
+  background: var(--panel);
+}
+
+input::placeholder, textarea::placeholder {
+  color: var(--muted);
+}
+
+.panel-header input:focus {
+  background: transparent;
+  box-shadow: 0 0 0 3px var(--focus-ring);
+  border-radius: 10px;
+}
+
+button {
+  border: none;
+  background: var(--primary);
+  color: #fff;
+  padding: 10px 14px;
+  border-radius: 12px;
+  cursor: pointer;
+  font-weight: 600;
+  transition: transform 0.15s ease, box-shadow 0.2s ease, background 0.2s ease, color 0.2s ease;
+}
+
+button:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 3px var(--focus-ring);
+}
+
+button.is-muted {
+  background: rgba(148, 163, 184, 0.2);
+  color: var(--muted);
+  border: 1px solid var(--border);
+  cursor: pointer;
+}
+
+button.is-muted:hover {
+  background: rgba(148, 163, 184, 0.28);
+}
+
+button:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+  filter: saturate(0.5);
+}
+
+button.secondary {
+  background: var(--panel-soft);
+  color: var(--text);
+  box-shadow: inset 0 0 0 1px var(--border);
+}
+
+button.secondary:hover {
+  background: var(--panel);
+}
+
+button.danger {
+  background: rgba(239, 68, 68, 0.15);
+  color: #ef4444;
+  border: 1px solid rgba(239, 68, 68, 0.4);
+}
+
+.layout {
+  display: grid;
+  gap: 24px;
+}
+
+.toast {
+  position: fixed;
+  right: 24px;
+  bottom: 24px;
+  background: var(--panel);
+  color: var(--text);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 10px 14px;
+  box-shadow: var(--shadow-soft);
+  font-size: 13px;
+  opacity: 0;
+  transform: translateY(8px);
+  transition: opacity 0.2s ease, transform 0.2s ease;
+  pointer-events: none;
+  z-index: 50;
+}
+
+.toast--visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.gantt {
+  display: grid;
+  gap: 12px;
+  --gantt-label-width: 260px;
+  --gantt-gap: 16px;
+  --gantt-side: 12px;
+  --gantt-row-height: 44px;
+  --gantt-row-gap: 0px;
+  --gantt-lane-row-height: 18px;
+  --gantt-lane-row-gap: 8px;
+  /* Horizontal offset added to every body-relative overlay (dep layer,
+     today line, grid lines, milestones) so they stay aligned with the
+     bars when an initiative spine pushes the lanes to the right. 0 unless
+     the initiative layer is active. */
+  --gantt-spine-width: 128px;
+  --gantt-spine-gap: 16px;
+  --gantt-x-offset: 0px;
+  /* Grid lines — row dividers, the spine/lane vertical dividers and the outer
+     timeline edge. A touch darker than the generic --border so the chart's
+     structure reads clearly without looking heavy. */
+  --gantt-line: color-mix(in srgb, var(--border) 82%, var(--text));
+}
+
+/* When the initiative grouping layer is on, reserve room for the left spine.
+   The header is shifted with padding so its month ticks line up with the
+   bars below, and the shared overlays pick up --gantt-x-offset. */
+.gantt--has-initiatives {
+  --gantt-x-offset: calc(var(--gantt-spine-width) + var(--gantt-spine-gap));
+}
+
+/* Standard (non-swimlane) initiative grouping: zero the spine→lanes gap so the
+   colour spine sits flush against its member rows, matching the contiguous
+   look swimlane mode gets from its own --gantt-spine-gap: 0 override. */
+.gantt--has-initiatives:not(.gantt--swimlane) {
+  --gantt-spine-gap: 0px;
+}
+
+.gantt--has-initiatives .gantt-header {
+  padding-left: var(--gantt-x-offset);
+}
+
+/* Initiative block: coloured spine on the left, member lanes stacked on the
+   right. Kept static (not positioned) so it doesn't interfere with the
+   offsetParent chain the dependency layer walks to measure bar Y positions. */
+.gantt-init-block {
+  display: flex;
+  gap: var(--gantt-spine-gap);
+  margin-bottom: 0;
+}
+
+.gantt-init-spine {
+  flex: 0 0 var(--gantt-spine-width);
+  /* Square grid cell with a thin colour accent strip down the left edge —
+     the initiative colour reads as a slim band rather than filling the whole
+     box (Aha-style), with the name laid out horizontally. Bottom + right
+     hairlines tie it into the contiguous lane grid. */
+  border: none;
+  border-left: 4px solid var(--init-colour, var(--accent));
+  border-right: 1px solid var(--gantt-line);
+  border-bottom: 1px solid var(--gantt-line);
+  border-radius: 0;
+  padding: 10px 12px;
+  color: var(--text);
+  background: var(--panel);
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: center;
+  gap: 4px;
+  position: relative;
+  cursor: pointer;
+  text-align: left;
+  font-family: inherit;
+}
+
+.gantt-init-spine-chevron {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  font-size: 10px;
+  opacity: 0.7;
+  color: var(--init-colour, var(--muted));
+}
+
+.gantt-init-spine-name {
+  font-family: 'Space Grotesk', sans-serif;
+  font-weight: 700;
+  font-size: 12px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  line-height: 1.2;
+}
+
+.gantt-init-spine-count {
+  font-size: 10px;
+  opacity: 0.7;
+  color: var(--muted);
+}
+
+.gantt-init-spine--ungrouped {
+  background: var(--panel-soft);
+  border: none;
+  border-left: 4px dashed var(--border);
+  border-right: 1px solid var(--gantt-line);
+  border-bottom: 1px solid var(--gantt-line);
+  border-radius: 0;
+  cursor: default;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+}
+
+.gantt-init-spine--ungrouped .gantt-init-spine-name {
+  color: var(--muted);
+  text-transform: uppercase;
+  font-size: 11px;
+}
+
+.gantt-init-lanes {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  min-width: 0;
+}
+
+/* The collapsed initiative reuses the live-lane markup; stretch it to fill the
+   lanes column so its bottom hairline lines up with the spine's. */
+.gantt-lane--collapsed-init {
+  flex: 1;
+}
+
+/* Standard (non-swimlane) collapsed row: the spine cell is taller than the
+   default 44px row (its name + count + padding), and as a flex-column child the
+   row keeps its intrinsic height, leaving a gap below it. Grow the row to fill
+   the lanes column so its bottom border lines up with the spine's bottom
+   hairline — same purpose as `.gantt-lane--collapsed-init` above. */
+.gantt-init-lanes .gantt-row--collapsed-init {
+  flex: 1 1 auto;
+}
+
+/* Aggregated initiative span shown when the group is collapsed — a single bar
+   running from the earliest member start to the latest member end, tinted to
+   match the initiative spine colour. */
+.gantt-init-agg-bar {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  height: 22px;
+  min-width: 0;
+  border-radius: 6px;
+  outline: 1px solid var(--accent);
+  outline-offset: -1px;
+  background: color-mix(in srgb, var(--accent) 18%, transparent);
+  color: var(--accent);
+  display: flex;
+  align-items: center;
+  padding: 0 8px;
+  font-size: 11px;
+  font-weight: 600;
+  overflow: hidden;
+  white-space: nowrap;
+  z-index: 2;
+}
+
+.gantt-init-agg-label {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  opacity: 0.85;
+}
+
+.gantt-init-collapsed-empty {
+  position: absolute;
+  top: 50%;
+  left: 0;
+  transform: translateY(-50%);
+  color: var(--muted);
+  font-size: 12px;
+}
+
+/* Spines stretch to match the lanes column; collapsed blocks shrink to the
+   single note row. */
+.gantt-init-block.is-collapsed .gantt-init-spine {
+  justify-content: center;
+}
+
+/* In swimlane mode the left-column label is just a short lane name
+   (e.g. MGA / OFF / GPO), not a long epic/fix name — so 260px is
+   wasted space. Narrowing the column frees ~140px for the bars. */
+.gantt--swimlane {
+  --gantt-label-width: 88px;
+  /* Aha-style contiguous grid: no gap between the label column and the
+     track, and no gap between the initiative spine and its lanes. Both the
+     layout and the body overlay calcs reference these vars, so zeroing them
+     keeps bars/today-line/grid-lines aligned. */
+  --gantt-gap: 0px;
+  --gantt-spine-gap: 0px;
+}
+
+.gantt--swimlane .gantt-lane {
+  align-items: stretch;
+  gap: 0;
+}
+
+.gantt--swimlane .gantt-lane-label {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  text-align: left;
+  /* Partial borders only (bottom row-divider + right column-divider) so
+     contiguous cells share a single 1px hairline instead of doubling up. */
+  border: none;
+  border-bottom: 1px solid var(--gantt-line);
+  border-right: 1px solid var(--gantt-line);
+  border-radius: 0;
+  background: var(--panel);
+  padding: 6px 12px;
+  width: 100%;
+  height: 100%;
+  box-sizing: border-box;
+}
+
+.gantt--swimlane .gantt-lane--alt .gantt-lane-label {
+  background: var(--panel-soft);
+}
+
+.gantt-scroll {
+  overflow: visible;
+  padding-bottom: 0;
+}
+
+.gantt-meta {
+  display: grid;
+  grid-template-columns: var(--gantt-label-width) 1fr;
+  gap: var(--gantt-gap);
+  align-items: center;
+  /* Breathing room below the toolbar — also gives the Manual-mode colour hint
+     (floated above the "Colour bars by" dropdown) clearance from the toolbar
+     pills above it. */
+  margin-top: 16px;
+}
+
+.gantt-header {
+  display: grid;
+  grid-template-columns: var(--gantt-label-width) 1fr;
+  gap: var(--gantt-gap);
+  align-items: end;
+}
+
+.gantt-labels {
+  font-size: 12px;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 0.18em;
+  font-weight: 600;
+  position: sticky;
+  left: 0;
+  background: var(--panel);
+  padding: 8px 0;
+  z-index: 2;
+}
+
+.gantt-labels-spacer {
+  background: transparent;
+}
+
+.gantt-timeline {
+  position: relative;
+  min-height: 110px;
+  border: 1px solid var(--gantt-line);
+  border-radius: 18px;
+  background: var(--panel-soft);
+  overflow: hidden;
+  box-sizing: border-box;
+}
+
+.gantt-dates {
+  position: relative;
+  /* Taller than the week-number row needs (numbers end ~50px) so there's a
+     dedicated band above the milestone circles (now at top ≈ 104px) for
+     stacked/staggered milestone labels — room for ~2 levels. */
+  height: 130px;
+}
+
+.gantt-months {
+  position: absolute;
+  top: 10px;
+  left: var(--gantt-side);
+  right: var(--gantt-side);
+}
+
+.gantt-month {
+  position: absolute;
+  transform: translateX(-50%);
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--text);
+  white-space: nowrap;
+}
+
+.gantt-month-year {
+  color: var(--muted);
+  font-weight: 500;
+  margin-left: 4px;
+}
+
+.gantt-ticks {
+  position: absolute;
+  top: 36px;
+  left: var(--gantt-side);
+  right: var(--gantt-side);
+  height: 32px;
+}
+
+.gantt-tick {
+  position: absolute;
+  font-size: 11px;
+  color: var(--muted);
+  height: 32px;
+  padding-left: 0;
+}
+
+/* Vertical tick line at each month boundary (shared by the end of one month
+   and the start of the next). Weekly ticks render numbers only. Extends
+   further down than the ticks container so it reaches towards the grid. */
+.gantt-tick-boundary {
+  position: absolute;
+  top: 0;
+  height: 127px; /* ticks extended slightly above gantt-dates bottom (130px) */
+  width: 0;
+  border-left: 1px solid var(--border);
+}
+
+.gantt-tick span {
+  position: absolute;
+  top: 0;
+  left: 0;
+  transform: translateX(-50%);
+  white-space: nowrap;
+}
+
+.gantt-milestone-row {
+  position: relative;
+  height: 24px;
+  border-top: 1px solid var(--border);
+  padding: 4px var(--gantt-side);
+}
+
+/* Milestone chips, arrows and lines now render via .gantt-milestones-overlay
+   (inside .gantt-chart-area, alongside .gantt-today-overlay) so a single
+   positioned element spans the header → body-gap → body gap without the 12px
+   grid gap breaking the line. See .gantt-milestones-overlay below. */
+
+.gantt-body {
+  display: grid;
+  gap: var(--gantt-row-gap);
+  position: relative;
+  /* Explicit z-index so the today overlay (z-index: 30, sibling of this
+     element in .gantt-chart-area) always paints above the body and its
+     lane-track children (which have z-index: 1 and create stacking
+     contexts of their own). Without this the browser renders .gantt-body
+     last-in-DOM order, letting lane content bleed over the today line. */
+  z-index: 1;
+}
+
+.gantt-legend {
+  /* Two-row layout: STATUS fills row 1; MARKERS + DEPENDENCIES + the
+     progress-toggle live on row 2. Achieved with flex-wrap + forcing
+     the Status group to claim the full width so everything after it
+     wraps onto a second line. */
+  display: flex;
+  gap: 6px 24px;
+  flex-wrap: wrap;
+  font-size: 12px;
+  color: var(--muted);
+  margin: 0;
+  align-items: center;
+  width: 100%;
+}
+
+.gantt-legend > .legend-group:first-child {
+  flex-basis: 100%;
+}
+
+/* Push the progress-shading toggle to the far right of the legend row so it
+   sits apart from the status/marker/dependency legend groups. */
+.gantt-progress-toggle {
+  margin-left: auto;
+  border: 1px solid var(--border);
+  background: var(--panel-soft);
+}
+
+.legend-group {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+  min-width: 0;
+}
+
+.legend-title {
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.16em;
+  color: var(--muted);
+  margin-right: 4px;
+}
+
+.legend-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--text);
+}
+
+.legend-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  display: inline-block;
+}
+
+.legend-dot.status-not-started {
+  background: var(--status-not-started);
+}
+
+.legend-dot.status-in-progress {
+  background: var(--status-in-progress);
+}
+
+.legend-dot.status-completed {
+  background: var(--status-completed);
+}
+
+.legend-dot.status-at-risk {
+  background: var(--status-at-risk);
+}
+
+.legend-dot.status-overdue {
+  background: var(--status-overdue);
+}
+
+.legend-line {
+  width: 24px;
+  height: 2px;
+  border-radius: 999px;
+  display: inline-block;
+  background: #ff5d2f;
+}
+
+.legend-line.dependency-ok {
+  background: #ff5d2f;
+}
+
+.legend-line.dependency-warning {
+  background: var(--status-overdue);
+}
+
+.legend-pill {
+  width: 34px;
+  height: 8px;
+  border-radius: 999px;
+  display: inline-block;
+}
+
+.legend-pill.marker-uat {
+  background: var(--marker-uat);
+}
+
+.legend-pill.marker-live {
+  background: var(--marker-live);
+}
+
+/* Diamond swatch used in the legend for UAT/Live markers. Mirrors the
+   .gantt-marker-point-diamond on the chart — same size, same dark-slate
+   outline — so the legend matches what the user sees on the bars. */
+.legend-diamond {
+  width: 10px;
+  height: 10px;
+  display: inline-block;
+  transform: rotate(45deg);
+  box-shadow: 0 0 0 1px #334155;
+  /* Small vertical nudge so the rotated square's bounding box visually
+     aligns with the adjacent legend text baseline. */
+  margin: 0 3px;
+}
+
+.legend-diamond.marker-uat {
+  background: var(--marker-uat);
+}
+
+.legend-diamond.marker-live {
+  background: var(--marker-live);
+}
+
+.legend-milestone {
+  width: 12px;
+  height: 12px;
+  border-radius: 3px;
+  border-left: 2px dotted var(--marker-milestone);
+  display: inline-block;
+}
+
+/* Upward-pointing purple arrow mirrors the today-arrow glyph on the timeline
+   (the tip that sits against the horizontal timeline line). width:0/height:0
+   with transparent left/right borders and a coloured bottom border is the
+   classic CSS triangle trick. */
+.legend-today {
+  width: 0;
+  height: 0;
+  border-left: 5px solid transparent;
+  border-right: 5px solid transparent;
+  border-bottom: 8px solid #8b5cf6;
+  display: inline-block;
+  vertical-align: middle;
+}
+
+body[data-theme='dark'] .legend-today {
+  border-bottom-color: #a78bfa;
+}
+
+.gantt-grid-lines {
+  position: absolute;
+  /* +1px on each side compensates for the 1px border on .gantt-timeline in the
+     header, so grid lines line up with the ticks/month labels above. */
+  left: calc(var(--gantt-x-offset) + var(--gantt-label-width) + var(--gantt-gap) + var(--gantt-side) + 1px);
+  right: calc(var(--gantt-side, 12px) + 1px);
+  top: 0;
+  bottom: 0;
+  pointer-events: none;
+  z-index: 0;
+  box-sizing: border-box;
+}
+
+.gantt-grid-line {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 0;
+  border-left: 1px solid var(--border);
+}
+
+.gantt-dependency-layer {
+  position: absolute;
+  /* Align with the bar's coordinate space (track padding-box, NOT the
+     --gantt-side–inset tick/grid column). Bars inside .gantt-track are
+     absolutely positioned with percentages relative to the track's full
+     padding-box, so the dep-arrow SVG must span the same region — otherwise
+     the same "X%" resolves to different viewport pixels in the SVG vs the
+     bar and arrow tips land inside the target bar. */
+  left: calc(var(--gantt-x-offset) + var(--gantt-label-width) + var(--gantt-gap));
+  right: 0;
+  top: 0;
+  bottom: 0;
+  pointer-events: none;
+  z-index: 4;
+}
+
+.gantt-dependency-layer svg {
+  width: 100%;
+  height: 100%;
+}
+
+/* Swimlane mode anchors the dep-layer to `.gantt-lane-inner`'s x-range so
+   arrows land on the same x as the bars and milestones inside it. That
+   inner wrapper is itself inset by `var(--gantt-gap) + var(--gantt-side)`
+   on the left and `var(--gantt-side)` on the right from the lane-track's
+   padding box (which starts 1px inside the track's border at
+   `var(--gantt-label-width)` — lane grid has `gap: 0`). So at the body
+   level the dep-layer inset works out to the same formula standard mode
+   uses, happening to also match the top tick area.
+
+   If this is changed, keep in sync with:
+     - `.gantt--swimlane .gantt-lane-inner` (positioning context for bars)
+     - `.gantt-today-overlay` (same x-range across both modes)
+     - swimlaneDependencyEdges `fromX`/`toX` percentages in Gantt.tsx. */
+.gantt--swimlane .gantt-dependency-layer {
+  left: calc(var(--gantt-x-offset) + var(--gantt-label-width) + var(--gantt-gap) + var(--gantt-side) + 1px);
+  right: calc(var(--gantt-side) + 1px);
+}
+
+/* Reveal the dep-create drag handle when hovering a swimlane bar or
+   milestone — same UX as standard mode. The handle itself is styled
+   globally in .gantt-dependency-handle. */
+.gantt--swimlane .gantt-lane-bar:hover .gantt-dependency-handle,
+.gantt--swimlane .gantt-lane-milestone:hover .gantt-dependency-handle,
+.gantt--swimlane .gantt-dependency-handle:focus-visible {
+  opacity: 1;
+}
+
+.gantt-dep-arrow.ok {
+  fill: #ff5d2f;
+}
+
+.gantt-dep-arrow.warning {
+  fill: var(--status-overdue);
+}
+
+.gantt-dependency-path {
+  stroke: #ff5d2f;
+  stroke-width: 2.5px;
+  fill: none;
+}
+
+.gantt-dependency-path.is-warning {
+  stroke: var(--status-overdue);
+}
+
+/* Manual dependencies share the orange colour but are drawn slightly bolder
+   so they read as authored-by-user at a glance. */
+.gantt-dep-arrow.manual {
+  fill: #ff5d2f;
+}
+
+.gantt-dependency-path.is-manual {
+  stroke: #ff5d2f;
+  stroke-width: 2.5px;
+}
+
+/* Preview path shown while the user is dragging from a handle. */
+.gantt-dep-arrow.preview {
+  fill: rgba(255, 93, 47, 0.7);
+}
+
+.gantt-dependency-path.is-preview {
+  stroke: rgba(255, 93, 47, 0.75);
+  stroke-width: 2px;
+  stroke-dasharray: 5 4;
+  fill: none;
+}
+
+.gantt-dependency-path.is-preview.is-valid-target {
+  stroke: #ff5d2f;
+  stroke-dasharray: none;
+}
+
+/* Hit area for picking up hover on a manual dep. Transparent but receives
+   pointer events along the stroke so the invisible thick line is easy to
+   target. The parent layer is pointer-events:none, so we opt back in here. */
+.gantt-dependency-remove-group {
+  pointer-events: auto;
+}
+
+.gantt-dependency-hit {
+  pointer-events: stroke;
+  cursor: pointer;
+}
+
+.gantt-dependency-remove-dot {
+  fill: #ffffff;
+  stroke: #ff5d2f;
+  stroke-width: 1.5px;
+  filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.2));
+}
+
+.gantt-dependency-remove-x {
+  stroke: #ff5d2f;
+  stroke-width: 1.8px;
+  stroke-linecap: round;
+  pointer-events: none;
+}
+
+/* Drag handle — small orange circle that sits on the right edge of a bar and
+   only appears on hover when dep editing is enabled. */
+.gantt-bar {
+  position: relative;
+}
+
+/*
+  Progress shading overlay on fix bars. Rendered as a semi-transparent white
+  layer covering the portion of the bar that is not yet complete, so the left
+  (done) portion keeps its full status colour and the right (outstanding)
+  portion appears lighter. Inline `left: N%` positions the boundary; the
+  element extends to the right edge of the bar.
+*/
+.gantt-bar-incomplete {
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(255, 255, 255, 0.55);
+  border-radius: 0 3px 3px 0;
+  pointer-events: none;
+}
+
+/*
+  Middle band for fix-version 3-way shading: the "in-flight" portion (stories
+  whose statusCategory is "indeterminate"). Sits between the fully-saturated
+  done segment on the left and the heavily-washed not-started tail on the
+  right, so the opacity here is a medium value — enough to read as distinct
+  from "done" but clearly more saturated than "not started". Left + width are
+  set inline from React. Uses the same white-wash as .gantt-bar-incomplete so
+  both themes render consistently.
+*/
+.gantt-bar-inflight {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  background: rgba(255, 255, 255, 0.28);
+  pointer-events: none;
+}
+
+.gantt-dependency-handle {
+  position: absolute;
+  top: 50%;
+  right: -7px;
+  width: 14px;
+  height: 14px;
+  padding: 0;
+  margin: 0;
+  transform: translateY(-50%);
+  background: #ff5d2f;
+  border: 2px solid #ffffff;
+  border-radius: 50%;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.25);
+  /* Stack above the UAT/Live marker (z:30) so a diamond positioned at
+     the bar's right edge can't block the handle's click target. */
+  z-index: 35;
+  cursor: grab;
+  opacity: 0;
+  transition: opacity 120ms ease-out, transform 120ms ease-out;
+  touch-action: none;
+}
+
+.gantt-bar.dep-edit-enabled:hover .gantt-dependency-handle,
+.gantt-bar.is-hovered .gantt-dependency-handle,
+.gantt-dependency-handle:focus-visible {
+  opacity: 1;
+}
+
+.gantt-dependency-handle:hover {
+  transform: translateY(-50%) scale(1.15);
+}
+
+.gantt-dependency-handle:active {
+  cursor: grabbing;
+}
+
+/* In swimlane mode the body-level grid-lines can't sit above lanes AND
+   below bars at the same time — they're siblings of the lanes and any
+   z-index high enough to show them above an opaque lane background also
+   puts them over the bars. We hide the body layer entirely and render a
+   dedicated grid-lines strip INSIDE each lane track (see
+   .gantt-lane-grid-lines below), which shares the track's stacking
+   context so lines sit above the lane background but below the bars. */
+.gantt--swimlane .gantt-grid-lines {
+  display: none;
+}
+
+/* Swimlane-only: close off the contiguous lane grid's outer top + far-right
+   edges in the --gantt-line tone. The internal row/column dividers come from
+   the cells' bottom/right hairlines; these two borders complete the box.
+   Scoped to swimlane so the standard view (which uses bordered .gantt-row
+   pills) is untouched. Rounded corners + overflow clip so the box reads as a
+   single card; the clip rounds the otherwise-square spine/lane corners. */
+.gantt--swimlane .gantt-body {
+  border-top: 1px solid var(--gantt-line);
+  border-right: 1px solid var(--gantt-line);
+  border-radius: 14px;
+  overflow: hidden;
+}
+
+/* When initiatives are off there's no left-hand spine to draw the box's left
+   edge, so the contiguous lane grid's left side reads as open. Draw it on the
+   leftmost cells (lane labels) rather than the body so the 1px doesn't shift
+   the track/bars out of alignment with the header ticks + today line. */
+.gantt--swimlane:not(.gantt--has-initiatives) .gantt-lane-label {
+  border-left: 1px solid var(--gantt-line);
+}
+
+/* Standard-mode initiative grouping: round the outer corners of the
+   spine + member-rows box so it matches the swimlane card treatment. The clip
+   curves the square top/bottom corners of the colour spine. */
+.gantt--has-initiatives:not(.gantt--swimlane) .gantt-body {
+  border-radius: 14px;
+  overflow: hidden;
+}
+
+/* Inside an initiative group the member rows form a contiguous grid, so drop
+   their individual pill rounding — the outer body clip handles the corners.
+   (When initiatives are off the standard rows keep their normal pill radius.) */
+.gantt--has-initiatives:not(.gantt--swimlane) .gantt-init-lanes .gantt-row,
+.gantt--has-initiatives:not(.gantt--swimlane) .gantt-init-lanes .gantt-row > .gantt-label {
+  border-radius: 0;
+}
+
+/* The spine has no top border of its own (its other edges are hairlines); in
+   standard mode there's no body top-border to close the box, so the spine's
+   top reads as open. Add a matching top hairline so the initiative box has a
+   continuous top edge across the spine + first row. */
+.gantt--has-initiatives:not(.gantt--swimlane) .gantt-init-spine {
+  border-top: 1px solid var(--border);
+}
+
+/* Each initiative is its own block, so a block's top borders (spine + first
+   row) stack directly under the previous block's bottom borders — drawing a
+   doubled hairline at every initiative boundary. It's unnoticed when blocks
+   are tall (expanded), but collapsing makes every block a single short row, so
+   the doubled line becomes obvious. Drop the top borders on every block after
+   the first and let the previous block's bottom border serve as the single
+   divider (mirrors the `.gantt-row + .gantt-row` border-top:none dedupe). */
+.gantt--has-initiatives:not(.gantt--swimlane) .gantt-init-block + .gantt-init-block .gantt-init-spine {
+  border-top: none;
+}
+
+.gantt--has-initiatives:not(.gantt--swimlane) .gantt-init-block + .gantt-init-block .gantt-init-lanes .gantt-row:first-child {
+  border-top: none;
+}
+
+.gantt-lane-grid-lines {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 1;
+}
+
+/* Inner positioning wrapper for swimlane bars and grid-lines. Its inset is
+   chosen so that its padding box has the same x-range as .gantt-ticks in
+   the top timeline — i.e. the top-tick at X% and the bar/grid-line at X%
+   land on the same viewport pixel. This fixes the month-tick / body-grid
+   misalignment that showed up in swimlane mode.
+
+   Left inset = `var(--gantt-gap) + var(--gantt-side)` because:
+     - the header's grid adds `var(--gantt-gap)` between the label and the
+       `.gantt-timeline`, but the swimlane `.gantt-lane` grid has `gap: 0`,
+     - the top `.gantt-ticks` is further inset by `var(--gantt-side)` inside
+       `.gantt-timeline`'s padding box.
+   Right inset = `var(--gantt-side)` matches the top ticks' right inset.
+   Bars/grid-lines inside use `left: X%` which now maps 1:1 to tick X%. */
+.gantt--swimlane .gantt-lane-inner {
+  position: absolute;
+  left: calc(var(--gantt-gap) + var(--gantt-side));
+  right: var(--gantt-side);
+  top: 0;
+  bottom: 0;
+  /* Keep overflow visible so the dep-create handle at `right: -7px` and
+     short-bar captions above the bar aren't clipped at the inner's right
+     or top edges. Matches `.gantt-lane-track`'s overflow override above. */
+  overflow: visible;
+}
+
+/* Wrapper for header + body so the today overlay is scoped correctly */
+.gantt-chart-area {
+  position: relative;
+  display: grid;
+  gap: 12px;
+  /* Explicit stacking context so z-index ordering between .gantt-body (1)
+     and .gantt-today-overlay (30) is well-defined and not affected by
+     ancestor stacking contexts. Without this the browser compares their
+     z-indexes in the outer context where lane-track children can still
+     bleed over the today line. */
+  isolation: isolate;
+}
+
+/* Today overlay — spans header + gap + body, excluding the legend */
+.gantt-today-overlay {
+  position: absolute;
+  /* +1px compensates for the .gantt-timeline border so the today line stays in
+     sync with the ticks above. */
+  left: calc(var(--gantt-x-offset) + var(--gantt-label-width) + var(--gantt-gap) + var(--gantt-side) + 1px);
+  right: calc(var(--gantt-side) + 1px);
+  top: 0;
+  bottom: 0;
+  pointer-events: none;
+  /* z-index must exceed .gantt-lane-track's z-index (1) so the today line
+     paints above swimlane bars even when lane tracks use overflow: visible. */
+  z-index: 30;
+}
+
+.gantt-today-overlay-line {
+  position: absolute;
+  top: 131px; /* 130px gantt-dates + 1px milestone border — line starts AT the horizontal timeline line */
+  bottom: 0;
+  width: 2px;
+  margin-left: -1px; /* visually centre the 2px line on the positioned x so the arrow/date line up */
+  background: #8b5cf6;
+}
+
+/* Today label — sits inside the overlay, pinned to the milestone row centre.
+   130px (gantt-dates) + 1px (border-top) + 12px (half of 24px milestone row) = 143px */
+.gantt-today-chip-label {
+  position: absolute;
+  top: 143px;
+  transform: translate(-50%, -50%);
+  background: #8b5cf6;
+  color: #fff;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  padding: 2px 7px;
+  border-radius: 4px;
+  white-space: nowrap;
+  line-height: 1.6;
+}
+
+/* Purple day number sitting in the date row, directly above today's arrow.
+   Positioned so its bottom edge sits between the weekly tick numbers
+   (now at top 36px, ending ~50px) and the horizontal timeline line (131px). */
+.gantt-today-date {
+  position: absolute;
+  top: 126px;
+  transform: translate(-50%, -100%);
+  background: #8b5cf6;
+  color: #fff;
+  font-size: 11px;
+  font-weight: 700;
+  line-height: 1;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Upward arrow sitting below the horizontal timeline line. Tip touches the
+   line from below at 131px from overlay top (130px gantt-dates + 1px milestone
+   border); body extends down into the milestone row. Same top as the milestone
+   arrow so the two arrowheads line up. */
+.gantt-today-arrow {
+  position: absolute;
+  top: 131px;
+  transform: translateX(-50%);
+  width: 0;
+  height: 0;
+  border-left: 5px solid transparent;
+  border-right: 5px solid transparent;
+  border-bottom: 10px solid #8b5cf6;
+}
+
+body[data-theme='dark'] .gantt-today-overlay-line {
+  background: #a78bfa;
+}
+
+body[data-theme='dark'] .gantt-today-chip-label {
+  background: #a78bfa;
+}
+
+body[data-theme='dark'] .gantt-today-date {
+  background: #a78bfa;
+  color: #0b1120;
+}
+
+body[data-theme='dark'] .gantt-today-arrow {
+  border-bottom-color: #a78bfa;
+}
+
+/* Milestone overlay — mirrors .gantt-today-overlay so the chip, arrow and
+   vertical line render as one continuous element spanning the header, the
+   12px grid gap, and the full Gantt body. This avoids the visible gap that
+   appeared when the milestone had two separate segments (one in the header
+   timeline, one in the body). z-index is below today (20) so today wins on
+   overlap. pointer-events: none on the wrapper (and all children) lets every
+   click, drag and hover pass through to bars underneath; milestone tooltip
+   hover is driven by a JS proximity check on .gantt-chart-area instead. */
+.gantt-milestones-overlay {
+  position: absolute;
+  left: calc(var(--gantt-x-offset) + var(--gantt-label-width) + var(--gantt-gap) + var(--gantt-side) + 1px);
+  right: calc(var(--gantt-side) + 1px);
+  top: 0;
+  bottom: 0;
+  pointer-events: none;
+  z-index: 15;
+}
+
+/* Zero-width anchor per milestone — positioned children all use left:0 so
+   they sit exactly on the anchor's x. */
+.gantt-milestone-overlay {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 0;
+}
+
+/* Hit detection for milestone hover lives in JS (chart-area mousemove with
+   x-proximity check) instead of a CSS hit strip. This keeps every visual
+   element pointer-events: none so bars and dependency handles below the
+   milestone band stay interactive at the milestone x-position. */
+
+/* Day-number circle — same vertical band as .gantt-today-date */
+.gantt-milestone-overlay-date {
+  position: absolute;
+  top: 126px;
+  left: 0;
+  transform: translate(-50%, -100%);
+  color: #fff;
+  font-size: 11px;
+  font-weight: 700;
+  line-height: 1;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+  z-index: 2;
+}
+
+/* Upward-pointing arrow — tip (apex) sits at the horizontal timeline line
+   (y=131) and the body extends 10px down into the milestone row. Same top as
+   .gantt-today-arrow so the milestone and today arrowheads line up; colour
+   supplied inline. */
+.gantt-milestone-overlay-arrow {
+  position: absolute;
+  top: 131px;
+  left: 0;
+  transform: translateX(-50%);
+  width: 0;
+  height: 0;
+  border-left: 5px solid transparent;
+  border-right: 5px solid transparent;
+  border-bottom: 10px solid;
+  pointer-events: none;
+  z-index: 1;
+}
+
+/* Optional milestone label — sits horizontally just right of the dotted line,
+   below the arrowhead. Toggled per milestone via the "Show label" control. */
+.gantt-milestone-overlay-label {
+  position: absolute;
+  /* Sit in the band above the date circle (circle top edge ≈ 104px), centred on
+     the line. --ms-label-level (0,1…) staggers overlapping labels onto stacked
+     rows, each 23px higher (chip height ~16px + a small vertical gap) so
+     neighbours never touch. Base 100px leaves a small gap above the circle;
+     week numbers end ~50px, leaving room for 2 staggered levels (the level is
+     capped — see msLabelLevels). --ms-color is the milestone colour, used for
+     the text and the tinted chip that links a raised label to its circle
+     (alongside the leader line below). */
+  top: calc(100px - var(--ms-label-level, 0) * 23px);
+  left: 0;
+  transform: translate(-50%, -100%);
+  text-align: center;
+  /* Labels are placed on separate vertical levels when they'd overlap, so each
+     can show in full. Hard cap at 160px so an isolated label doesn't run on. */
+  max-width: 160px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 10px;
+  font-weight: 600;
+  color: var(--ms-color, currentColor);
+  background: color-mix(in srgb, var(--ms-color, transparent) 16%, transparent);
+  border: 1px solid color-mix(in srgb, var(--ms-color, transparent) 45%, transparent);
+  border-radius: 5px;
+  padding: 1px 6px;
+  pointer-events: none;
+  z-index: 2;
+}
+
+/* Leader line: a short dotted tick (in the milestone colour) dropping from a
+   raised label's chip down to its date circle, so it's clear which milestone a
+   staggered label belongs to. Only rendered for level ≥ 1. */
+.gantt-milestone-overlay-leader {
+  position: absolute;
+  left: 0;
+  top: calc(100px - var(--ms-label-level, 0) * 23px);
+  height: calc(4px + var(--ms-label-level, 0) * 23px);
+  width: 0;
+  margin-left: -1px;
+  border-left: 2px dotted;
+  pointer-events: none;
+  z-index: 1;
+}
+
+/* Dotted vertical line from the horizontal timeline line (y=131) down to the
+   bottom of the chart. width:0 + border-left:2px dotted draws a 2px dashed
+   line; margin-left:-1px visually centres those 2px on the anchor x (same
+   trick as .gantt-today-overlay-line) so the arrowhead above sits dead
+   centre on the line. */
+.gantt-milestone-overlay-line {
+  position: absolute;
+  top: 131px;
+  bottom: 0;
+  left: 0;
+  width: 0;
+  margin-left: -1px;
+  border-left: 2px dotted;
+  pointer-events: none;
+}
+
+.gantt-row {
+  display: grid;
+  grid-template-columns: var(--gantt-label-width) 1fr;
+  gap: var(--gantt-gap);
+  align-items: center;
+  position: relative;
+  /* Intentionally NO z-index here. A z-index on .gantt-row creates a
+     stacking context that caps UAT/Live markers (z:30) beneath the
+     chart-level .gantt-dependency-layer (z:4), AND puts the row/track
+     above the dep-layer's clickable remove-X hit targets — which stops
+     dependency deletion from working. Leaving the row without a
+     stacking context lets the marker's z:30 escape and compete
+     directly against the dep-layer at chart-body level. */
+  min-height: var(--gantt-row-height);
+  user-select: none;
+  border: 1px solid var(--border);
+}
+
+.gantt-row + .gantt-row {
+  border-top: none;
+}
+
+/* Round the four corners of the grid (first row top, last row bottom) so it
+   matches the rounded timeline box above. The inner label column has its own
+   background, so it also needs matching border-radius to not poke past the
+   rounded corners. */
+.gantt-row:not(.gantt-row + .gantt-row) {
+  border-top-left-radius: 18px;
+  border-top-right-radius: 18px;
+}
+
+.gantt-row:not(.gantt-row + .gantt-row) > .gantt-label {
+  border-top-left-radius: 18px;
+}
+
+.gantt-row:not(:has(+ .gantt-row)) {
+  border-bottom-left-radius: 18px;
+  border-bottom-right-radius: 18px;
+}
+
+.gantt-row:not(:has(+ .gantt-row)) > .gantt-label {
+  border-bottom-left-radius: 18px;
+}
+
+/* Subtle row highlight on hover \u2014 no horizontal dividers between rows. */
+.gantt-row:hover {
+  background: rgba(96, 165, 250, 0.12);
+  border-bottom-color: transparent;
+}
+
+/* Tint the sticky label column on hover too. The label has its own opaque
+   background (so bars don't bleed through during horizontal scroll), which
+   would otherwise cover the row-level hover tint. Layered gradient keeps it
+   opaque while adding the same blue cast. */
+.gantt-row:hover > .gantt-label {
+  background:
+    linear-gradient(rgba(96, 165, 250, 0.12), rgba(96, 165, 250, 0.12)),
+    var(--panel);
+}
+
+/* Outline the bar rectangle on row hover for an extra visual cue beyond the
+   background tint. */
+.gantt-row:hover .gantt-bar {
+  box-shadow: 0 0 0 2px rgba(96, 165, 250, 0.55);
+}
+
+/* Dark mode: nudge the hover tint and outline up slightly — the same opacity
+   values read a touch dimmer against the dark panel colour. */
+body[data-theme='dark'] .gantt-row:hover {
+  background: rgba(96, 165, 250, 0.16);
+}
+
+body[data-theme='dark'] .gantt-row:hover > .gantt-label {
+  background:
+    linear-gradient(rgba(96, 165, 250, 0.16), rgba(96, 165, 250, 0.16)),
+    var(--panel);
+}
+
+body[data-theme='dark'] .gantt-row:hover .gantt-bar {
+  box-shadow: 0 0 0 2px rgba(96, 165, 250, 0.65);
+}
+
+.gantt-row.is-dep-highlight .gantt-bar {
+  box-shadow: 0 0 0 2px rgba(47, 109, 246, 0.35);
+}
+
+.gantt-row.is-dep-highlight .gantt-label a,
+.gantt-row.is-dep-highlight .gantt-label span {
+  color: #1d4ed8;
+}
+
+/* In dark mode the #1d4ed8 dep-highlight colour becomes near-unreadable
+   against the dark panel (dark-blue text on a dark-blue-tinted background).
+   Keep the label in the normal text colour instead. */
+body[data-theme='dark'] .gantt-row.is-dep-highlight .gantt-label a,
+body[data-theme='dark'] .gantt-row.is-dep-highlight .gantt-label span {
+  color: var(--text);
+}
+
+.gantt-label {
+  display: flex;
+  align-items: flex-start;
+  gap: 6px;
+  font-size: 13px;
+  position: sticky;
+  left: 0;
+  background: var(--panel);
+  padding: 6px 4px;
+  z-index: 1;
+  align-self: stretch;
+  box-shadow: 1px 0 0 var(--border);
+}
+
+.gantt-label-content {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.gantt-label a {
+  color: var(--text);
+  text-decoration: none;
+}
+
+.gantt-label a:hover {
+  text-decoration: underline;
+}
+
+.gantt-progress {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.gantt-progress-track {
+  flex: 0 0 var(--gantt-progress-width);
+  height: 6px;
+  background: var(--border);
+  border-radius: 999px;
+  overflow: hidden;
+  min-width: var(--gantt-progress-width);
+}
+
+.gantt-progress-fill {
+  height: 100%;
+  background: #22c55e;
+  border-radius: 999px;
+}
+
+.gantt-progress-text {
+  font-size: 11px;
+  color: var(--muted);
+  white-space: nowrap;
+}
+
+.gantt-label .toggle {
+  border: none;
+  background: transparent;
+  color: var(--muted);
+  font-size: 14px;
+  padding: 0 4px;
+  cursor: pointer;
+}
+
+.gantt-label .toggle.spacer {
+  display: inline-block;
+  width: 16px;
+}
+
+.gantt-track {
+  position: relative;
+  height: 28px;
+  /* +1px compensates for the .gantt-timeline border so bars align with the
+     grid lines and ticks above. */
+  padding: 0 calc(var(--gantt-side) + 1px);
+  /* No z-index — same reason as .gantt-row: a stacking context here would
+     cap the UAT/Live marker (z:30) beneath the chart-level dep-layer. */
+  box-sizing: border-box;
+  overflow: visible;
+}
+
+
+.gantt-dependency-interactive {
+  position: absolute;
+  inset: 0;
+  /* Don't intercept pointer events on this wrapper — the old "Blocked by"
+     popup has moved into .gantt-bar-tooltip, so the only thing this div
+     contains is the .gantt-dependency-track strip (which already has
+     pointer-events:none). Leaving this at `auto` blocked hover on the
+     underlying .gantt-bar because this overlay is a DOM sibling that
+     paints on top of the bar without a stacking context. */
+  pointer-events: none;
+}
+
+.gantt-dependency-track {
+  position: absolute;
+  left: var(--gantt-side);
+  right: var(--gantt-side);
+  bottom: 3px;
+  height: 8px;
+  pointer-events: none;
+}
+
+.gantt-dependency-track::before {
+  display: none;
+}
+
+.gantt-dependency-chip {
+  position: absolute;
+  height: 4px;
+  border-radius: 999px;
+  background: #ff5d2f;
+  top: 50%;
+  transform: translateY(-50%);
+}
+
+.gantt-dependency-chip.is-warning {
+  background: var(--status-overdue);
+}
+
+/*
+  Unified bar-hover tooltip. Replaces both the native `title` tooltip on bars
+  and the old standalone `.gantt-dependency-tooltip`. Shows the row label,
+  start/end dates, and — when there are incoming dependencies — the "Blocked
+  by" list, all in one themed panel.
+
+  Rendered via React portal at document.body and positioned with `position:
+  fixed` (inline `top`/`left`/`right` set from the bar's bounding rect). This
+  escapes every overflow:hidden ancestor — `.gantt-timeline` in particular
+  uses overflow:hidden for rounded-corner clipping, which was otherwise
+  cropping the right edge of the tooltip on bars near the chart edge.
+*/
+.gantt-bar-tooltip {
+  position: fixed;
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  box-shadow: 0 10px 18px rgba(15, 23, 42, 0.18);
+  padding: 10px 12px;
+  font-size: 12px;
+  color: var(--text);
+  min-width: 200px;
+  max-width: 340px;
+  z-index: 1000;
+  /* Non-interactive: the cursor passes through the tooltip to whatever sits
+     below, so the bar/marker `mouseleave` fires the moment the cursor leaves
+     the hovered element — even if it passes over the tooltip on the way out. */
+  pointer-events: none;
+  white-space: normal;
+  /* Reset inherited bar styling so the panel reads as a standalone popover
+     rather than a small tinted chip. */
+  font-weight: 400;
+  line-height: 1.35;
+}
+
+.gantt-bar-tooltip-dates {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  color: var(--muted);
+  font-size: 11px;
+}
+
+/* UAT / Live marker tooltip — shares `.gantt-bar-tooltip` panel styling.
+   Min-width can be smaller than a bar tooltip since there's no deps list. */
+.gantt-marker-tooltip {
+  min-width: 160px;
+}
+
+.gantt-marker-tooltip-title {
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  font-size: 10px;
+  color: var(--muted);
+  margin-bottom: 6px;
+}
+
+.gantt-bar-tooltip-dates .label {
+  display: inline-block;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  font-size: 9px;
+  color: var(--muted);
+  margin-right: 6px;
+  opacity: 0.8;
+}
+
+.gantt-bar-tooltip-deps {
+  margin-top: 8px;
+  padding-top: 8px;
+  border-top: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.gantt-bar-tooltip-deps .dep-title {
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  font-size: 9px;
+  color: var(--muted);
+}
+
+.gantt-bar-tooltip-deps .dep-links {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  font-size: 11px;
+}
+
+.gantt-bar-tooltip-deps a {
+  color: #60a5fa;
+  text-decoration: none;
+}
+
+.gantt-bar-tooltip-deps a:hover {
+  text-decoration: underline;
+}
+
+.gantt-lane {
+  display: grid;
+  grid-template-columns: var(--gantt-label-width) 1fr;
+  gap: var(--gantt-gap);
+  align-items: start;
+  position: relative;
+  z-index: 1;
+}
+
+.gantt-lane-label {
+  position: sticky;
+  left: 0;
+  background: var(--panel);
+  padding: 6px 4px;
+  font-size: 13px;
+  font-weight: 600;
+  z-index: 1;
+}
+
+.gantt-lane-track {
+  position: relative;
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  background: var(--panel);
+  padding: 0 var(--gantt-side);
+  box-sizing: border-box;
+  overflow: hidden;
+}
+
+.gantt--swimlane .gantt-lane-track {
+  z-index: 1;
+  /* Square, contiguous band: drop the rounded box border and keep only a
+     bottom hairline so stacked lanes read as one grid (Aha-style). */
+  border: none;
+  border-bottom: 1px solid var(--gantt-line);
+  border-radius: 0;
+  /* Override the standard-mode `overflow: hidden` so in swimlane:
+     (a) the dep-create handle at `right: -7px` on bars doesn't get clipped,
+     (b) the overhead caption for short bars (drawn at barTop - 14) isn't
+         clipped when it sits above the track's inner padding. The lane
+         background/border still clip normally because `overflow` only
+         affects children, not the element's own painted box. */
+  overflow: visible;
+}
+
+.gantt--swimlane .gantt-lane--alt .gantt-lane-track {
+  background: var(--panel-soft);
+}
+
+/* Row-level hover tint for swimlane lanes — mirrors `.gantt-row:hover` in
+   standard mode. Tints the label pill AND the track background blue when
+   the cursor is anywhere over the lane (label, empty track space, or a
+   bar). Per-bar box-shadow hover (.gantt-lane-bar:hover) layers on top
+   of this, giving the same two-level cue the standard view has. */
+.gantt--swimlane .gantt-lane:hover .gantt-lane-track {
+  background:
+    linear-gradient(rgba(96, 165, 250, 0.12), rgba(96, 165, 250, 0.12)),
+    var(--panel);
+}
+
+.gantt--swimlane .gantt-lane--alt:hover .gantt-lane-track {
+  background:
+    linear-gradient(rgba(96, 165, 250, 0.12), rgba(96, 165, 250, 0.12)),
+    var(--panel-soft);
+}
+
+.gantt--swimlane .gantt-lane:hover .gantt-lane-label {
+  background:
+    linear-gradient(rgba(96, 165, 250, 0.12), rgba(96, 165, 250, 0.12)),
+    var(--panel);
+}
+
+/* Dark-mode variants: bump the opacity a touch so the tint reads against
+   the darker panel surfaces — same delta used by .gantt-row:hover in
+   standard dark mode. */
+body[data-theme='dark'] .gantt--swimlane .gantt-lane:hover .gantt-lane-track {
+  background:
+    linear-gradient(rgba(96, 165, 250, 0.16), rgba(96, 165, 250, 0.16)),
+    var(--panel);
+}
+
+body[data-theme='dark'] .gantt--swimlane .gantt-lane--alt:hover .gantt-lane-track {
+  background:
+    linear-gradient(rgba(96, 165, 250, 0.16), rgba(96, 165, 250, 0.16)),
+    var(--panel-soft);
+}
+
+body[data-theme='dark'] .gantt--swimlane .gantt-lane:hover .gantt-lane-label {
+  background:
+    linear-gradient(rgba(96, 165, 250, 0.16), rgba(96, 165, 250, 0.16)),
+    var(--panel);
+}
+
+.gantt-lane-empty {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 12px;
+  color: var(--muted);
+  white-space: nowrap;
+}
+
+.gantt-empty-state {
+  padding: 40px 24px;
+  text-align: center;
+  font-size: 14px;
+  color: var(--muted);
+  grid-column: 1 / -1;
+}
+
+/* ── Gantt loading state ── */
+.gantt-toolbar {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 8px;
+  padding: 0 4px;
+}
+
+.gantt-refresh-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  font-size: 12px;
+  font-weight: 600;
+  color: #fff;
+  background: var(--primary);
+  border: none;
+  border-radius: 6px;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.12);
+  cursor: pointer;
+  transition: background 120ms ease, box-shadow 120ms ease;
+}
+
+.gantt-refresh-btn:hover {
+  background: var(--primary-strong);
+  box-shadow: 0 2px 6px rgba(37, 99, 235, 0.35);
+}
+
+.gantt-refresh-btn:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+
+.gantt-refresh-btn svg {
+  display: block;
+}
+
+/* Swimlane Bars / Milestones toggle living inside .gantt-toolbar.
+   Uses the same pill styling as the filter-bar toggles but grouped
+   together visually via a shared background shell. */
+.gantt-toolbar-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 3px;
+  background: var(--panel-soft);
+  border-radius: 8px;
+  box-shadow: inset 0 0 0 1px var(--border);
+}
+
+.gantt-toolbar-toggle .toggle-pill {
+  font-size: 12px;
+  padding: 4px 10px;
+  border-radius: 6px;
+}
+
+.gantt-loading-state {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 28px 24px;
+}
+
+.gantt-loading-label {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--muted);
+}
+
+.gantt-loading-bar {
+  height: 6px;
+  border-radius: 999px;
+  background: var(--border);
+  overflow: hidden;
+}
+
+.gantt-loading-bar__fill {
+  height: 100%;
+  width: 40%;
+  border-radius: 999px;
+  background: var(--primary);
+  animation: gantt-loading-sweep 1.4s ease-in-out infinite;
+}
+
+@keyframes gantt-loading-sweep {
+  0%   { transform: translateX(-150%); }
+  100% { transform: translateX(350%); }
+}
+
+.gantt-lane-item {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 1;
+}
+
+.gantt-lane-label-pill {
+  position: absolute;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 4px 10px;
+  border-radius: 999px;
+  background: var(--panel);
+  border: 1px solid var(--border);
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text);
+  white-space: nowrap;
+  z-index: 6;
+  pointer-events: auto;
+  transition: transform 0.2s ease, box-shadow 0.2s ease, z-index 0.2s ease;
+  text-decoration: none;
+}
+
+.gantt-lane-label-pill:hover {
+  z-index: 6;
+  transform: translateY(-2px);
+  box-shadow: 0 12px 24px rgba(15, 23, 42, 0.35);
+}
+
+.gantt-lane-label-pill .status-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: var(--status-not-started);
+  box-shadow: 0 0 0 3px rgba(15, 23, 42, 0.14);
+}
+
+.gantt-lane-label-pill .label-progress {
+  font-size: 11px;
+  font-weight: 700;
+  padding: 2px 8px;
+  border-radius: 999px;
+  background: var(--panel);
+  border: 1px solid var(--border);
+  color: var(--status-in-progress);
+}
+
+.gantt-lane-label-pill.status-not-started .status-dot {
+  background: var(--status-not-started);
+  box-shadow: 0 0 0 3px rgba(15, 23, 42, 0.14);
+}
+
+.gantt-lane-label-pill.status-in-progress .status-dot {
+  background: var(--status-in-progress);
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.18);
+}
+
+.gantt-lane-label-pill.status-completed .status-dot {
+  background: var(--status-completed);
+  box-shadow: 0 0 0 3px rgba(34, 197, 94, 0.18);
+}
+
+.gantt-lane-label-pill.status-at-risk .status-dot {
+  background: var(--status-at-risk);
+  box-shadow: 0 0 0 3px rgba(245, 158, 11, 0.18);
+}
+
+.gantt-lane-label-pill.status-overdue .status-dot {
+  background: var(--status-overdue);
+  box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.18);
+}
+
+.gantt-lane-bar {
+  position: absolute;
+  /* Squared-off corners to match the standard Gantt `.gantt-bar.fix`
+     styling (4px radius) so bars look consistent across the two views. */
+  border-radius: 4px;
+  background: var(--status-not-started);
+  z-index: 1;
+  /* Parent `.gantt-lane-item` disables pointer events so it doesn't
+     cover the empty lane area. Re-enable on the bar itself so hover
+     (for the dep-handle reveal + hover state) and clicks on the
+     drag-handle reach their targets. */
+  pointer-events: auto;
+  transition: box-shadow 140ms ease, filter 140ms ease;
+}
+
+.gantt--swimlane .gantt-lane-bar {
+  z-index: 2;
+}
+
+/* Hover state for swimlane bars: blue outline glow + slight brightness
+   lift, matching `.gantt-row:hover .gantt-bar` in standard mode. */
+.gantt--swimlane .gantt-lane-bar:hover {
+  box-shadow: 0 0 0 2px rgba(96, 165, 250, 0.55);
+  filter: brightness(1.06);
+}
+
+body[data-theme='dark'] .gantt--swimlane .gantt-lane-bar:hover {
+  box-shadow: 0 0 0 2px rgba(96, 165, 250, 0.65);
+}
+
+/* Milestones also need pointer-events re-enabled so the dep-handle is
+   clickable and the underline-on-hover fires on the caption. */
+.gantt-lane-milestone {
+  pointer-events: auto;
+}
+
+/* For milestones: pin the handle to the RIGHT edge of the DIAMOND so
+   drags naturally originate from the "outgoing" side of the milestone
+   (dependency arrows run left-to-right). The diamond is the first child
+   of the anchor and ~12px wide; the caption now floats absolutely above
+   it, so the anchor's layout width equals the diamond's width. `right:
+   -7px` therefore sits just off the diamond's right tip — the user's
+   expected anchor for "drag outward to create a dependency". */
+.gantt-lane-milestone .gantt-dependency-handle {
+  right: -7px;
+  left: auto;
+}
+
+/* Labelled swimlane bar: contains the name + progress % directly inside
+   the bar. We keep the outer rounded rectangle, add flex layout for the
+   two children, and leave overflow VISIBLE on the bar itself so the
+   drag-create handle (rendered at right: -7px) isn't clipped. Ellipsis
+   truncation for the name is handled by the inner .gantt-lane-bar-text
+   which has its own overflow: hidden. The text-shadow pushes the white
+   label off the bar colour for readability on lighter status shades. */
+.gantt-lane-bar--labelled {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 6px;
+  padding: 0 8px;
+  overflow: visible;
+  white-space: nowrap;
+  /* Pure white for the in-bar label with a faint shadow just to keep it
+     readable when the bar colour is a light status shade. Inner
+     `.gantt-lane-bar-text` still truncates with ellipsis. */
+  color: #ffffff;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.25);
+  text-decoration: none;
+  box-sizing: border-box;
+}
+
+/* Anchor-specific overrides: browser `a:link` styling was bleeding through
+   the class colour declaration on some setups, leaving the bar text
+   blue. Force white on every anchor state so the label stays readable
+   regardless of the user's link-colour preferences. */
+a.gantt-lane-bar--labelled,
+a.gantt-lane-bar--labelled:link,
+a.gantt-lane-bar--labelled:visited,
+a.gantt-lane-bar--labelled:hover,
+a.gantt-lane-bar--labelled:active {
+  color: #ffffff;
+  text-decoration: none;
+}
+
+a.gantt-lane-bar--labelled:hover {
+  filter: brightness(1.05);
+}
+
+.gantt-lane-bar-text {
+  flex: 1 1 auto;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.gantt-lane-bar-progress {
+  flex: 0 0 auto;
+  font-weight: 700;
+  opacity: 0.9;
+}
+
+/* Short-bar caption: sits just above the bar when the bar is too narrow
+   to hold the name + progress% without ellipsing to a single letter.
+   Small, low-key text so it identifies the bar without competing with
+   the longer in-bar labels above it. */
+.gantt-lane-bar-short-label {
+  position: absolute;
+  font-size: 10px;
+  font-weight: 600;
+  color: var(--muted, #6b7280);
+  white-space: nowrap;
+  pointer-events: none;
+  transform: translateX(-2px);
+  line-height: 1;
+  z-index: 3;
+  max-width: 80px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Milestone view: replaces the bar with a diamond + caption at the
+   bar's end date. The wrapper is absolutely positioned at the end-date
+   percentage; the diamond is a 12x12 square rotated 45°; the caption
+   sits to the right so the eye can read the release name without a
+   hover. pointer-events on the anchor make the whole thing clickable. */
+.gantt-lane-milestone {
+  position: absolute;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  transform: translateX(-8px);
+  z-index: 2;
+  color: var(--text);
+  font-size: 12px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.gantt-lane-milestone-hit,
+.gantt-lane-milestone-hit:link,
+.gantt-lane-milestone-hit:visited,
+.gantt-lane-milestone-hit:hover,
+.gantt-lane-milestone-hit:active {
+  /* Position:relative so the absolutely-positioned caption below
+     positions relative to this anchor (specifically, relative to the
+     diamond — which is the only in-flow child once caption is absolute). */
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 0;
+  /* Explicit color on every anchor state — `color: inherit` alone has been
+     losing to browser/extension default link colouring in some cases. */
+  color: var(--text);
+  text-decoration: none;
+}
+
+/* Caption floats ABOVE the diamond rather than sitting beside it, so the
+   horizontal dependency arrow that lands at the diamond's left edge
+   doesn't run through the text. It stays inside the anchor so clicking
+   the text still triggers the Jira-link navigation via event bubbling. */
+.gantt-lane-milestone-caption {
+  position: absolute;
+  bottom: calc(100% + 2px);
+  left: 0;
+  color: var(--text);
+  font-size: 11px;
+  font-weight: 600;
+  white-space: nowrap;
+  /* The caption can extend well to the right of the diamond. Keep it
+     above the dep layer so hovers on it still reach the milestone. */
+  z-index: 2;
+}
+
+.gantt-lane-milestone-hit:hover .gantt-lane-milestone-caption {
+  text-decoration: underline;
+}
+
+.gantt-lane-milestone-diamond {
+  width: 12px;
+  height: 12px;
+  transform: rotate(45deg);
+  background: var(--status-not-started);
+  outline: 1px solid rgba(0, 0, 0, 0.15);
+  flex: 0 0 auto;
+}
+
+.gantt-lane-milestone.status-not-started .gantt-lane-milestone-diamond {
+  background: var(--status-not-started);
+}
+
+.gantt-lane-milestone.status-in-progress .gantt-lane-milestone-diamond {
+  background: var(--status-in-progress);
+}
+
+.gantt-lane-milestone.status-completed .gantt-lane-milestone-diamond {
+  background: var(--status-completed);
+}
+
+.gantt-lane-milestone.status-at-risk .gantt-lane-milestone-diamond {
+  background: var(--status-at-risk);
+}
+
+.gantt-lane-milestone.status-overdue .gantt-lane-milestone-diamond {
+  background: var(--status-overdue);
+}
+
+.gantt-lane-marker {
+  position: absolute;
+  border-radius: 3px;
+  background: var(--marker-uat);
+  z-index: 2;
+}
+
+.gantt--swimlane .gantt-lane-marker {
+  z-index: 3;
+}
+
+.gantt-lane-marker.marker-uat {
+  background: var(--marker-uat);
+  outline: 1px solid var(--marker-uat);
+}
+
+.gantt-lane-marker.marker-live {
+  background: var(--marker-live);
+  outline: 1px solid var(--marker-live);
+}
+
+.gantt-lane-bar.status-not-started {
+  background: var(--status-not-started);
+  outline: 1px solid var(--status-not-started);
+}
+
+.gantt-lane-bar.status-in-progress {
+  background: var(--status-in-progress);
+  outline: 1px solid var(--status-in-progress);
+}
+
+.gantt-lane-bar.status-completed {
+  background: var(--status-completed);
+  outline: 1px solid var(--status-completed);
+}
+
+.gantt-lane-bar.status-at-risk {
+  background: var(--status-at-risk);
+  outline: 1px solid var(--status-at-risk);
+}
+
+.gantt-lane-bar.status-overdue {
+  background: var(--status-overdue);
+  outline: 1px solid var(--status-overdue);
+}
+
+.gantt-bar {
+  position: absolute;
+  /* Default (epic) sizing. Fix and story override top/height below so all
+     three bar types share a common vertical centre line within the row. */
+  top: 5px;
+  height: 18px;
+  border-radius: 3px;
+  /* No z-index — previously z:2, which created a stacking context that
+     capped the inner .gantt-dependency-handle. We need the handle to sit
+     ABOVE the UAT/Live marker (z:30) so dep-edit works when UAT lands at
+     the bar's right edge. Letting the bar use z:auto means the handle's
+     own z-index resolves at the chart-body level and can win against the
+     marker. The bar still renders correctly: dep-layer (z:4) stays above
+     bars (as before), and markers (z:30) stay above dep-layer. */
+}
+
+/* Fix bars — the widest/tallest tier in the hierarchy. */
+.gantt-bar.fix {
+  top: 2px;
+  height: 24px;
+  border-radius: 4px;
+  background: var(--status-not-started);
+  outline: 1px solid var(--status-not-started);
+}
+
+.gantt-bar.fix.status-in-progress {
+  background: var(--status-in-progress);
+  outline-color: var(--status-in-progress);
+}
+
+.gantt-bar.fix.status-completed {
+  background: var(--status-completed);
+  outline-color: var(--status-completed);
+}
+
+.gantt-bar.fix.status-at-risk {
+  background: var(--status-at-risk);
+  outline-color: var(--status-at-risk);
+}
+
+.gantt-bar.fix.status-overdue {
+  background: var(--status-overdue);
+  outline-color: var(--status-overdue);
+}
+
+/* Epic bars are always rendered in Jira's epic purple (#904EE2) regardless
+   of status — matches the purple epic icon and keeps each Jira tier
+   (fix / epic / story) visually distinct by colour rather than status.
+   The status-* classes are still applied to the DOM so tooltips/logic can
+   read them, but the paint is uniform. */
+.gantt-bar.epic,
+.gantt-bar.epic.status-not-started,
+.gantt-bar.epic.status-in-progress,
+.gantt-bar.epic.status-completed,
+.gantt-bar.epic.status-at-risk,
+.gantt-bar.epic.status-overdue {
+  background: #904EE2;
+  outline: 1px solid #904EE2;
+}
+
+/* Story bars — the smallest tier in the height hierarchy. Solid-filled
+   like epics and fixes. Stories are always rendered in the green
+   "in-progress" colour regardless of Jira status so the chart reads as
+   a single story-shaped band rather than a status-coloured spectrum. */
+.gantt-bar.story,
+.gantt-bar.story.status-not-started,
+.gantt-bar.story.status-in-progress,
+.gantt-bar.story.status-completed {
+  top: 8px;
+  height: 12px;
+  border-radius: 2px;
+  background: var(--status-in-progress);
+  outline: 1px solid var(--status-in-progress);
+}
+
+/* ---- Jira type icons ---------------------------------------------------- */
+
+/* Left-hand panel: icon sits inline with the row label, slightly below the
+   text baseline so the glyph reads as a leading marker rather than a prefix.
+   gantt-label-row pulls icon + label into a flex row inside the
+   otherwise-column gantt-label-content. */
+.gantt-label-row {
+  display: flex;
+  /* Align the icon with the TOP line of text — otherwise multi-line labels
+     (e.g. "GPO-6613 — Ireland: Order Form Update") end up with the icon
+     floating in the middle rather than reading as a leading marker for the
+     first line. */
+  align-items: flex-start;
+  gap: 6px;
+  min-width: 0; /* allow label truncation inside the flex row */
+}
+
+.gantt-label-icon {
+  flex: 0 0 auto;
+  display: block;
+  /* Nudge the icon down slightly so its visual centre lines up with the
+     cap-height of the first line rather than the very top of the line box. */
+  margin-top: 2px;
+}
+
+/* Tooltip header row: icon + row identifier (fix name or Jira key)
+   sits at the top of the popover. Subtle separator below so it reads as a
+   distinct header from the status/dates block. */
+.gantt-bar-tooltip-type {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text, #f8fafc);
+  padding-bottom: 6px;
+  border-bottom: 1px solid var(--border, rgba(255, 255, 255, 0.08));
+  margin-bottom: 4px;
+}
+
+.gantt-marker {
+  position: absolute;
+  top: 0;
+  height: 100%;
+  width: 2px;
+}
+
+.gantt-marker.uat {
+  background: var(--marker-uat);
+}
+
+.gantt-marker.live {
+  background: var(--marker-live);
+}
+
+.gantt-pill {
+  position: absolute;
+  top: 5px;
+  height: 18px;
+  border-radius: 3px;
+  z-index: 2;
+}
+
+.gantt-pill.uat {
+  background: var(--marker-uat);
+  outline: 1px solid var(--marker-uat);
+}
+
+.gantt-pill.live {
+  background: var(--marker-live);
+  outline: 1px solid var(--marker-live);
+}
+
+/* ------------------------------------------------------------------
+   Point-in-time diamond marker + label (UAT / Live).
+   Rendered at the key date (UAT yellow, Live green) with a small
+   caption underneath. No animation and no range pill — the diamond
+   stands on its own.
+------------------------------------------------------------------ */
+.gantt-marker-point {
+  position: absolute;
+  /* The `left` inline style is expressed as the exact x-position; the
+     wrapper translates so its centre aligns with that point. */
+  transform: translateX(-50%);
+  /* Sits above the dependency layer (z:4) AND the today-line overlay's
+     inner items so the UAT/Live diamond always reads cleanly, even when
+     a dependency line would otherwise route across it. */
+  z-index: 30;
+  pointer-events: none;
+  /* Text colour drives both diamond background and label colour via
+     currentColor, so uat/live variants below can just swap `color`. */
+}
+.gantt-marker-point-diamond {
+  position: relative;
+  width: 10px; height: 10px;
+  /* `currentcolor` is the CSS-spec form; stylelint's value-keyword-case
+     rule flags the SVG-era `currentColor` camelCase. The keyword is
+     case-insensitive at runtime, so lowercase is a safe cleanup. */
+  background: currentcolor;
+  transform: rotate(45deg);
+  margin: 0 auto;
+  /* 1px dark-slate border — same darker tone used for bar outlines
+     rather than pure black, so the diamond sits cleanly against the
+     fix-version bar without feeling harsh. */
+  box-shadow: 0 0 0 1px #334155;
+  pointer-events: auto;
+  cursor: pointer;
+}
+/* The diamond is rendered as a <div> with role="button" and tabIndex={0}
+   so it doesn't inherit the generic button:focus-visible rule above.
+   Mirror the outline pattern used by .gantt-refresh-btn:focus-visible so
+   keyboard users see a clear focus indicator on UAT/Live markers. */
+.gantt-marker-point-diamond:focus-visible {
+  outline: 2px solid var(--focus-ring, var(--primary));
+  outline-offset: 3px;
+}
+.gantt-marker-point-label {
+  display: block;
+  margin-top: 5px;
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  color: currentcolor;
+  text-align: center;
+}
+.gantt-marker-point.uat  { color: var(--marker-uat); }
+.gantt-marker-point.live { color: var(--marker-live); }
+
+/* ------------------------------------------------------------------
+   External-dependencies badge.
+   Small purple circle with a "!" pinned to the top-left corner of a
+   fix-version bar when its tickets link out to other projects. The
+   hover surfaces the linked ticket keys via the shared marker
+   tooltip machinery.
+------------------------------------------------------------------ */
+.gantt-ext-link-badge {
+  position: absolute;
+  top: -6px;
+  left: -6px;
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: #8b5cf6;
+  color: #fff;
+  border: 1.5px solid #fff;
+  font-size: 10px;
+  font-weight: 900;
+  line-height: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: help;
+  z-index: 7;
+  box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.2);
+  font-family: -apple-system, system-ui, sans-serif;
+  user-select: none;
+}
+/* Swimlane variant positions absolutely within the lane track wrapper
+   rather than relative to the bar — top/left come from inline styles.
+   Parent `.gantt-lane-item` sets `pointer-events: none` so labels don't
+   block bar-hover; re-enable events here so the hover tooltip + keyboard
+   focus on the badge actually fire. */
+.gantt-ext-link-badge--lane {
+  position: absolute;
+  pointer-events: auto;
+}
+/* Inline variant rendered at the start of the milestone-view caption.
+   Unsets the absolute positioning so it flows inline with the text;
+   keeps the purple badge look, scaled down to sit neatly alongside
+   the 11px caption without bumping the baseline. */
+.gantt-ext-link-badge--caption {
+  position: static;
+  display: inline-flex;
+  width: 12px;
+  height: 12px;
+  margin-right: 4px;
+  vertical-align: -1px;
+  font-size: 9px;
+  border-width: 1px;
+}
+/* The ext-link badge is a <span role="button" tabIndex={0}>, so it needs
+   an explicit focus indicator just like .gantt-marker-point-diamond. The
+   outer white border already separates the badge from the bar; the
+   outline sits outside that so the purple circle stays crisp. */
+.gantt-ext-link-badge:focus-visible {
+  outline: 2px solid var(--focus-ring, var(--primary));
+  outline-offset: 2px;
+}
+.gantt-ext-link-keys {
+  font-size: 12px;
+  line-height: 1.5;
+  color: var(--text);
+  /* `word-break: break-word` is a non-standard alias; the spec-compliant
+     equivalent is `overflow-wrap: anywhere`. */
+  overflow-wrap: anywhere;
+}
+
+.level-1 .gantt-label {
+  padding-left: 18px;
+  /* Epic rows sit one step below the fix version in the hierarchy, so they
+     read at a slightly smaller size to reinforce the nesting. */
+  font-size: 12px;
+}
+
+.level-2 .gantt-label {
+  padding-left: 36px;
+  /* Stories are the deepest level and should feel quieter than epics. */
+  font-size: 11px;
+}
+
+/* ============================================================
+   Expanded-group tint
+   When a fix version is expanded, the parent + its epic/story children
+   all share a pale blue tint so the group reads as a single block.
+   No outer border or outline — the tint alone does the grouping work.
+   A fix is "expanded" when the next sibling is a child row (level-1
+   or level-2); children only render when the parent is expanded, so
+   their presence in the DOM is the cue.
+   ============================================================ */
+.gantt-row.level-0:has(+ .gantt-row.level-1),
+.gantt-row.level-0:has(+ .gantt-row.level-2),
+.gantt-row.level-1,
+.gantt-row.level-2 {
+  background: rgba(59, 130, 246, 0.12);
+}
+
+/* The sticky label column has its own opaque panel background that would
+   otherwise cover the row-level tint, so layer the tint on top. */
+.gantt-row.level-0:has(+ .gantt-row.level-1) > .gantt-label,
+.gantt-row.level-0:has(+ .gantt-row.level-2) > .gantt-label,
+.gantt-row.level-1 > .gantt-label,
+.gantt-row.level-2 > .gantt-label {
+  background:
+    linear-gradient(rgba(59, 130, 246, 0.12), rgba(59, 130, 246, 0.12)),
+    var(--panel);
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+}
+
+.fix-versions-table-card,
+.milestone-card,
+.custom-bars-card {
+  font-size: 12px;
+}
+
+.fix-versions-table-card h3,
+.milestone-card h3,
+.custom-bars-card h3 {
+  font-size: 14px;
+  margin: 0;
+}
+
+.fix-versions-table-card .table,
+.milestone-card .table,
+.custom-bars-card .table {
+  font-size: 12px;
+}
+
+.fix-versions-table-card .table th,
+.fix-versions-table-card .table td,
+.milestone-card .table th,
+.milestone-card .table td,
+.custom-bars-card .table th,
+.custom-bars-card .table td {
+  padding: 8px 6px;
+}
+
+.fix-versions-table-card input,
+.milestone-card input,
+.milestone-card select,
+.custom-bars-card input,
+.custom-bars-card select {
+  font-size: 12px;
+}
+
+/* ── Compact Fix Version picker ───────────────────────────────────────────── */
+
+.fix-version-picker {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.fix-version-picker__labels,
+.fix-version-picker__row {
+  display: grid;
+  grid-template-columns: minmax(220px, 2.2fr) repeat(4, minmax(130px, 1fr)) minmax(140px, 1.2fr) auto;
+  gap: 10px;
+  align-items: center;
+}
+
+.fix-version-picker__actions {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  justify-self: end;
+}
+
+.fix-version-picker__labels {
+  font-size: 11px;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+  padding-bottom: 6px;
+  border-bottom: 1px solid var(--border);
+}
+
+.fix-version-picker__row select {
+  width: 100%;
+  padding: 7px 10px;
+  font-size: 12px;
+  background: var(--panel-soft);
+  color: var(--text);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+}
+
+.fix-version-picker__row select:focus {
+  outline: none;
+  border-color: var(--primary);
+  box-shadow: 0 0 0 2px var(--focus-ring);
+}
+
+/* ── Themed date picker ──────────────────────────────────────────────────── */
+
+.themed-date-picker {
+  position: relative;
+  width: 100%;
+}
+
+.themed-date-picker__input-wrap {
+  display: flex;
+  align-items: stretch;
+  width: 100%;
+  background: var(--panel-soft);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  overflow: hidden;
+  transition: border-color 120ms ease, box-shadow 120ms ease;
+}
+
+.themed-date-picker__input-wrap:focus-within {
+  border-color: var(--primary);
+  box-shadow: 0 0 0 2px var(--focus-ring);
+}
+
+.themed-date-picker__input {
+  flex: 1;
+  min-width: 0;
+  padding: 7px 10px;
+  font-size: 12px;
+  background: transparent;
+  color: var(--text);
+  border: none;
+  outline: none;
+  font-variant-numeric: tabular-nums;
+}
+
+.themed-date-picker__input::placeholder {
+  color: var(--muted);
+}
+
+.themed-date-picker__trigger {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 8px;
+  background: transparent;
+  border: none;
+  border-left: 1px solid var(--border);
+  color: var(--muted);
+  cursor: pointer;
+  transition: color 120ms ease, background 120ms ease;
+}
+
+.themed-date-picker__trigger:hover:not(:disabled) {
+  color: var(--primary);
+  background: color-mix(in srgb, var(--primary) 8%, transparent);
+}
+
+.themed-date-picker__trigger:disabled {
+  cursor: not-allowed;
+}
+
+.themed-date-picker.is-disabled .themed-date-picker__input-wrap {
+  opacity: 0.5;
+}
+
+.themed-date-picker.is-disabled .themed-date-picker__input {
+  cursor: not-allowed;
+}
+
+.themed-date-picker.is-invalid .themed-date-picker__input-wrap {
+  border-color: var(--status-overdue);
+  background: color-mix(in srgb, var(--status-overdue) 12%, var(--panel-soft));
+}
+
+.themed-date-picker__popup {
+  position: absolute;
+  top: calc(100% + 6px);
+  left: 0;
+  z-index: 50;
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  box-shadow: 0 12px 32px rgba(15, 23, 42, 0.18);
+  padding: 6px;
+  /* Declare RDP size variables on the popup wrapper itself so they cascade
+     to `.rdp-root` with a selector weight that beats RDP's own :root/.rdp-root
+     defaults regardless of style-import order. */
+  --rdp-day-width: 30px;
+  --rdp-day-height: 30px;
+  --rdp-day_button-width: 28px;
+  --rdp-day_button-height: 28px;
+  --rdp-nav_button-width: 24px;
+  --rdp-nav_button-height: 24px;
+  --rdp-month-caption-font-size: 12px;
+}
+
+/* React-day-picker renders its day grid as a nested <table>. When the popup
+   opens inside another table context (the milestone card's edit table), the
+   ambient ".table td { padding: 8px 6px }" rule cascaded into the RDP day
+   cells, inflating each 30px cell to 40px+ and blowing the popup up to 294px
+   wide. Reset padding on RDP's own grid cells so they honour the
+   --rdp-day-width / --rdp-day-height variables. */
+.themed-date-picker__popup .rdp-month_grid td,
+.themed-date-picker__popup .rdp-month_grid th {
+  padding: 0;
+}
+
+/* Flip the popup above the input when there isn't enough room below. */
+.themed-date-picker__popup.is-above {
+  top: auto;
+  bottom: calc(100% + 6px);
+}
+
+body[data-theme='dark'] .themed-date-picker__popup {
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.55);
+}
+
+/* ── react-day-picker theme overrides ────────────────────────────────────── */
+
+.themed-date-picker__popup .rdp-root {
+  --rdp-accent-color: var(--primary);
+  --rdp-accent-background-color: color-mix(in srgb, var(--primary) 14%, transparent);
+  --rdp-today-color: var(--primary);
+  --rdp-background-color: var(--panel);
+  --rdp-range_middle-background-color: color-mix(in srgb, var(--primary) 14%, transparent);
+  --rdp-selected-border: 2px solid var(--primary);
+  /* Tighter day size so the whole popup stays compact. */
+  --rdp-day-width: 30px;
+  --rdp-day-height: 30px;
+  --rdp-day_button-width: 28px;
+  --rdp-day_button-height: 28px;
+  --rdp-weekday-padding: 4px 0;
+  --rdp-nav_button-width: 24px;
+  --rdp-nav_button-height: 24px;
+  --rdp-month-caption-font-size: 12px;
+
+  color: var(--text);
+  font-size: 11px;
+  margin: 0;
+}
+
+.themed-date-picker__popup .rdp-month {
+  margin: 0;
+}
+
+.themed-date-picker__popup .rdp-months {
+  margin: 0;
+}
+
+.themed-date-picker__popup .rdp-month_grid {
+  margin: 0;
+}
+
+.themed-date-picker__popup .rdp-caption_label,
+.themed-date-picker__popup .rdp-month_caption {
+  color: var(--text);
+  font-weight: 600;
+}
+
+.themed-date-picker__popup .rdp-weekday {
+  color: var(--muted);
+  font-weight: 600;
+  text-transform: uppercase;
+  font-size: 10px;
+  letter-spacing: 0.4px;
+}
+
+.themed-date-picker__popup .rdp-nav button,
+.themed-date-picker__popup .rdp-button_previous,
+.themed-date-picker__popup .rdp-button_next {
+  color: var(--text);
+  background: transparent;
+  border: 1px solid transparent;
+  border-radius: 6px;
+  transition: background 120ms ease, border-color 120ms ease;
+}
+
+.themed-date-picker__popup .rdp-nav button:hover,
+.themed-date-picker__popup .rdp-button_previous:hover,
+.themed-date-picker__popup .rdp-button_next:hover {
+  background: color-mix(in srgb, var(--primary) 10%, transparent);
+  border-color: var(--border);
+}
+
+.themed-date-picker__popup .rdp-day {
+  color: var(--text);
+}
+
+.themed-date-picker__popup .rdp-day_button {
+  border-radius: 6px;
+  transition: background 120ms ease, color 120ms ease;
+}
+
+.themed-date-picker__popup .rdp-day_button:hover:not([disabled]) {
+  background: color-mix(in srgb, var(--primary) 14%, transparent);
+  color: var(--text);
+}
+
+.themed-date-picker__popup .rdp-day_outside .rdp-day_button {
+  color: var(--muted);
+  opacity: 0.6;
+}
+
+.themed-date-picker__popup .rdp-today:not(.rdp-selected) .rdp-day_button {
+  color: var(--primary);
+  font-weight: 700;
+}
+
+.themed-date-picker__popup .rdp-selected .rdp-day_button,
+.themed-date-picker__popup .rdp-day_selected .rdp-day_button {
+  background: var(--primary);
+  color: #ffffff;
+  font-weight: 600;
+  border: none;
+}
+
+.themed-date-picker__popup .rdp-selected .rdp-day_button:hover,
+.themed-date-picker__popup .rdp-day_selected .rdp-day_button:hover {
+  background: var(--primary-strong);
+  color: #ffffff;
+}
+
+.fix-version-picker__release {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 7px 10px;
+  background: var(--panel-soft);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  font-size: 12px;
+  color: var(--text);
+  min-height: 32px;
+}
+
+.fix-version-picker__release.is-empty {
+  color: var(--muted);
+  font-style: italic;
+}
+
+.fix-version-picker__jira-tag {
+  font-size: 10px;
+  font-weight: 600;
+  background: #0052cc;
+  color: #ffffff;
+  padding: 2px 6px;
+  border-radius: 3px;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  font-style: normal;
+}
+
+.fix-version-picker__save {
+  padding: 7px 16px;
+  font-size: 12px;
+  font-weight: 600;
+  border-radius: 6px;
+  cursor: pointer;
+  white-space: nowrap;
+  background: var(--primary);
+  color: #ffffff;
+  border: 1px solid var(--primary);
+}
+
+.fix-version-picker__save:hover:not(:disabled) {
+  background: var(--primary-strong);
+  border-color: var(--primary-strong);
+}
+
+.fix-version-picker__save:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.fix-version-picker__error {
+  color: var(--status-overdue);
+  font-size: 12px;
+  margin-top: 4px;
+}
+
+.fix-version-picker__saved {
+  color: var(--success);
+  font-size: 12px;
+  margin-top: 4px;
+}
+
+@media (max-width: 900px) {
+  .fix-version-picker__labels {
+    display: none;
+  }
+  .fix-version-picker__row {
+    grid-template-columns: 1fr 1fr;
+  }
+  .fix-version-picker__row select,
+  .fix-version-picker__release,
+  .fix-version-picker__actions {
+    grid-column: 1 / -1;
+  }
+  .fix-version-picker__actions {
+    justify-self: stretch;
+  }
+  .fix-version-picker__save {
+    flex: 1;
+  }
+}
+
+.milestone-form {
+  display: grid;
+  /* Date column changed from 1.2fr to `auto` so it sizes to the themed
+     picker's fixed 150px rather than expanding and leaving a gap between
+     the date box and the colour picker. Label keeps its 2fr so it remains
+     the dominant element; the scope dropdown fills the remaining space. */
+  grid-template-columns: 2fr auto auto 1fr auto;
+  gap: 8px;
+  align-items: center;
+  margin-bottom: 12px;
+}
+
+/* Label input only — `> input` stops the rule leaking into the themed date
+   picker's internal <input type="text">, which was getting a 140px min-width
+   that squeezed the calendar trigger button out past overflow:hidden. */
+.milestone-form > input[type='text'] {
+  min-width: 140px;
+}
+
+.milestone-form input[type='date'] {
+  min-width: 130px;
+}
+
+/* Size the themed date picker to a compact width matching the Fix Version
+   modal (~150px). width:auto stops it stretching into the wider table/grid
+   cells; the explicit width gives the input + trigger button enough room
+   to render without clipping. */
+.milestone-card .themed-date-picker {
+  width: 150px;
+  max-width: 150px;
+}
+
+/* Constrain the Date column in the edit table so the td doesn't stretch to
+   its share of the table width (was ~337px), leaving ~187px of empty space
+   next to the picker. 170px gives the 150px picker a small breathing buffer
+   inside the cell's 6px horizontal padding. */
+.milestone-card .milestone-table thead th:nth-child(2),
+.milestone-card .milestone-table tbody td:nth-child(2) {
+  width: 170px;
+}
+
+
+.milestone-form button {
+  white-space: nowrap;
+}
+
+/* Inline colour picker — makes it obvious the control is a colour chooser */
+.color-picker {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 10px;
+  border-radius: 10px;
+  border: 1px solid var(--border);
+  background: var(--panel-soft);
+  cursor: pointer;
+  user-select: none;
+  line-height: 1;
+  white-space: nowrap;
+}
+
+.color-picker:hover {
+  border-color: var(--accent, #6366f1);
+}
+
+/* Mirror :hover on keyboard focus so users tabbing through the form get a
+   visible cue. The native input[type='color'] is the focus target (it sits
+   transparent on top), so we use :focus-within on the wrapper. */
+.color-picker:focus-within {
+  border-color: var(--accent, #6366f1);
+  box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.35);
+  outline: none;
+}
+
+.color-picker-swatch {
+  width: 18px;
+  height: 18px;
+  border-radius: 4px;
+  border: 1px solid rgba(0, 0, 0, 0.15);
+  background: var(--swatch, #6366f1);
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.2);
+  flex-shrink: 0;
+}
+
+.color-picker-label {
+  font-size: 12px;
+  color: var(--muted);
+  letter-spacing: 0.02em;
+}
+
+/* Overlay the native colour input transparently so the picker anchors
+   to the label and the swatch + text remain visible. */
+.color-picker input[type='color'] {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  padding: 0;
+  margin: 0;
+  border: 0;
+  background: transparent;
+  opacity: 0;
+  cursor: pointer;
+}
+
+/* Compact variant for use inside table rows */
+.color-picker--compact {
+  padding: 4px 8px;
+  gap: 6px;
+}
+
+.color-picker--compact .color-picker-swatch {
+  width: 16px;
+  height: 16px;
+}
+
+.color-picker--compact .color-picker-label {
+  font-size: 11px;
+}
+
+.section-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 12px;
+}
+
+.card.is-collapsed {
+  padding: 0 16px;
+  min-height: var(--collapsed-card-height);
+  height: var(--collapsed-card-height);
+  display: flex;
+  align-items: center;
+}
+
+.card.is-collapsed .section-header {
+  margin-bottom: 0;
+  min-height: 28px;
+  width: 100%;
+  height: 100%;
+  align-items: center;
+}
+
+.table th,
+.table td {
+  text-align: left;
+  padding: 10px 8px;
+  border-bottom: 1px solid var(--border);
+}
+
+.table input {
+  width: 100%;
+}
+
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 12px;
+  color: var(--muted);
+}
+
+.badge-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+}
+
+.auth-fallback {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  gap: 12px;
+  color: var(--text);
+  font-family: inherit;
+  padding: 32px;
+  text-align: center;
+}
+
+.auth-fallback .auth-error {
+  color: #ef4444;
+}
+
+.jira-link-banner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin: 12px 32px;
+  padding: 10px 16px;
+  border-radius: 8px;
+  background: rgba(59, 130, 246, 0.12);
+  color: var(--text);
+  border: 1px solid rgba(59, 130, 246, 0.3);
+}
+
+.forbidden-toast {
+  position: fixed;
+  top: 16px;
+  right: 16px;
+  z-index: 1000;
+  max-width: 360px;
+  padding: 12px 16px;
+  background: #b91c1c;
+  color: #fff;
+  border-radius: 8px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.25);
+  font-size: 14px;
+}
+
+.admin-page {
+  padding: 24px 32px;
+  max-width: 960px;
+  margin: 0 auto;
+}
+
+.admin-page .muted {
+  color: var(--muted);
+  margin-bottom: 16px;
+}
+
+.admin-users-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.admin-users-table th,
+.admin-users-table td {
+  text-align: left;
+  padding: 10px 8px;
+  border-bottom: 1px solid var(--border);
+}
+
+.admin-users-table select {
+  padding: 4px 8px;
+}
+
+.error-banner {
+  margin: 12px 0;
+  padding: 10px 14px;
+  border-radius: 6px;
+  background: rgba(239, 68, 68, 0.15);
+  color: #ef4444;
+  border: 1px solid rgba(239, 68, 68, 0.3);
+}
+
+.release-notes {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.release-notes-card {
+  position: relative;
+  width: 100%;
+  max-width: 980px;
+  margin: 0 auto;
+  padding: 28px 30px;
+  border-radius: 24px;
+  border: 1px solid var(--border);
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.92) 0%, var(--panel) 45%);
+  box-shadow: 0 24px 50px rgba(15, 23, 42, 0.12), 0 2px 8px rgba(15, 23, 42, 0.06);
+  overflow: hidden;
+}
+
+.release-notes-card::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(circle at top right, rgba(37, 99, 235, 0.14), transparent 55%),
+    radial-gradient(circle at 10% 20%, rgba(249, 115, 22, 0.12), transparent 45%);
+  pointer-events: none;
+}
+
+body[data-theme='dark'] .release-notes-card {
+  background: linear-gradient(180deg, rgba(15, 23, 42, 0.65) 0%, var(--panel) 45%);
+  box-shadow: 0 24px 50px rgba(2, 6, 23, 0.45), 0 2px 8px rgba(2, 6, 23, 0.3);
+}
+
+.release-notes-card > * {
+  position: relative;
+  z-index: 1;
+}
+
+.release-notes-list {
+  margin-top: 22px;
+  display: grid;
+  gap: 14px;
+}
+
+.release-notes-item {
+  display: grid;
+  grid-template-columns: minmax(120px, 170px) 1fr;
+  gap: 16px;
+  align-items: center;
+  padding: 16px 18px;
+  border-radius: 16px;
+  border: 1px solid var(--border);
+  background: var(--panel);
+  text-decoration: none;
+  color: inherit;
+  position: relative;
+  overflow: hidden;
+  transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+}
+
+.release-notes-item::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(135deg, rgba(37, 99, 235, 0.08), transparent 60%);
+  opacity: 0;
+  transition: opacity 0.2s ease;
+}
+
+.release-notes-item:hover {
+  transform: translateY(-2px);
+  border-color: rgba(37, 99, 235, 0.35);
+  box-shadow: 0 18px 36px rgba(15, 23, 42, 0.12);
+}
+
+.release-notes-item:hover::before {
+  opacity: 1;
+}
+
+.release-title {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 14px;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  font-weight: 700;
+  color: var(--primary-strong);
+}
+
+.release-date {
+  font-size: 12px;
+  color: var(--muted);
+  margin-top: 4px;
+}
+
+.release-summary {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text);
+}
+
+.release-notes-nav {
+  margin-bottom: 18px;
+}
+
+.release-notes-nav a {
+  color: var(--primary);
+  text-decoration: none;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.release-notes-nav a:hover {
+  text-decoration: underline;
+}
+
+.release-notes-error {
+  padding: 14px 16px;
+  border-radius: 12px;
+  background: rgba(239, 68, 68, 0.08);
+  border: 1px solid rgba(239, 68, 68, 0.3);
+  color: #ef4444;
+  font-weight: 600;
+}
+
+.release-notes-content h1 {
+  font-size: 28px;
+  margin: 0 0 8px;
+}
+
+.release-notes-content h2 {
+  margin-top: 28px;
+  font-size: 20px;
+  border-bottom: 1px solid var(--border);
+  padding-bottom: 8px;
+}
+
+.release-notes-content h3 {
+  margin-top: 20px;
+  font-size: 16px;
+}
+
+.release-notes-content p {
+  color: var(--muted);
+  line-height: 1.6;
+}
+
+.release-notes-content ul {
+  margin: 8px 0 0 18px;
+  color: var(--text);
+}
+
+.release-notes-content li {
+  margin: 6px 0;
+}
+
+.release-notes-content a {
+  color: var(--primary);
+  text-decoration: none;
+  font-weight: 600;
+}
+
+.release-notes-content a:hover {
+  text-decoration: underline;
+}
+
+.release-notes-content .tag {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 999px;
+  background: var(--panel-soft);
+  border: 1px solid var(--border);
+  color: var(--muted);
+  font-size: 12px;
+  margin-right: 6px;
+}
+
+.release-notes-content .note {
+  background: var(--panel-soft);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 12px 14px;
+  font-size: 14px;
+  color: var(--text);
+  margin-top: 18px;
+}
+
+.release-notes-content .nav {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin: 12px 0 6px;
+}
+
+.release-notes-content .nav a {
+  font-size: 13px;
+}
+
+.release-notes-content .footer {
+  margin-top: 32px;
+  font-size: 12px;
+  color: var(--muted);
+}
+
+@media (max-width: 720px) {
+  .release-notes-card {
+    padding: 22px 20px;
+  }
+
+  .release-notes-item {
+    grid-template-columns: 1fr;
+    align-items: flex-start;
+  }
+}
+
+/* Background "Updating…" indicator for the Gantt card.
+   Sits top-right of the card, non-blocking. Uses a position anchor on the
+   card so the Gantt itself stays fully visible and interactive. */
+.fix-versions-card {
+  position: relative;
+  /* Outer card border = the Gantt's top/right/outer edges. Match the slightly
+     darker --gantt-line tone (defined on the inner .gantt, so it doesn't
+     inherit up here — repeat the expression). */
+  border-color: color-mix(in srgb, var(--border) 82%, var(--text));
+  /* Break the Gantt card out of the .app 1240px cap so ONLY the Gantt gets
+     the extra width — the panels below stay at the standard page width.
+     Centred on the viewport via justify-self (not transform, which would
+     re-anchor the Gantt's position:fixed tooltips/popovers). Capped at
+     1600px and never wider than the viewport minus the page gutters. */
+  --gantt-card-width: min(1600px, calc(100vw - 48px));
+  width: var(--gantt-card-width);
+  /* Centre on the page content axis (same centre as the .app container) by
+     pulling left half of the overflow. Using 50% (relative to the parent,
+     which excludes the scrollbar) instead of justify-self/100vw avoids the
+     scrollbar-width offset that was pushing the chart off-centre. */
+  margin-left: calc(50% - var(--gantt-card-width) / 2);
+}
+
+/* Mirror of the updating indicator, pinned top-left. Shows when the roadmap
+   was last refreshed from Jira (the snapshot's generation time). */
+.gantt-last-refreshed {
+  position: absolute;
+  top: 14px;
+  left: 18px;
+  z-index: 2;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--muted);
+  pointer-events: none;
+}
+
+.gantt-updating-indicator {
+  position: absolute;
+  top: 14px;
+  right: 18px;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 12px;
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--muted);
+  box-shadow: var(--shadow);
+  z-index: 2;
+  pointer-events: none;
+}
+
+.gantt-updating-indicator__spinner {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  border: 2px solid var(--border);
+  border-top-color: var(--accent);
+  animation: gantt-updating-spin 0.9s linear infinite;
+}
+
+@keyframes gantt-updating-spin {
+  to { transform: rotate(360deg); }
+}
+
+/* ── Structured Done / Doing / To Do summary layout ─────────────────────────
+   Backend-rendered AI summaries produce an intro paragraph followed by up to
+   three bucket headings, each with a bulleted list. Each bullet may be
+   prefixed with an italic workstream label and/or suffixed with a "blocked"
+   pill. Margins are tuned to sit comfortably inside the panel grid without
+   forcing extra rows.
+*/
+
+.wu-section-summary .wu-sum-intro {
+  margin: 0 0 8px 0;
+  line-height: 1.45;
+  color: var(--text);
+}
+
+/* Belt-and-braces: every descendant of the summary inherits the theme
+   text token. Guards against ancestor wrappers (e.g. the inline panel
+   variant) whose hard-coded colours would otherwise leak in. */
+.wu-section-summary,
+.wu-section-summary p,
+.wu-section-summary span,
+.wu-section-summary em,
+.wu-section-summary strong,
+.wu-section-summary li {
+  color: var(--text);
+}
+
+.wu-section-summary .wu-sum-head {
+  margin: 10px 0 2px 0;
+  line-height: 1.2;
+  font-size: 0.92em;
+  letter-spacing: 0.01em;
+  color: var(--text);
+}
+
+.wu-section-summary .wu-sum-head strong {
+  font-weight: 600;
+}
+
+.wu-section-summary .wu-sum-list {
+  margin: 0 0 6px 0;
+  padding-left: 20px;
+  line-height: 1.4;
+  color: var(--text);
+}
+
+.wu-section-summary .wu-sum-list li {
+  margin: 2px 0;
+  color: var(--text);
+}
+
+.wu-section-summary .wu-sum-list li::marker {
+  color: var(--text);
+}
+
+.wu-section-summary .wu-sum-ws {
+  font-style: italic;
+  color: var(--text);
+  margin-right: 2px;
+}
+
+.wu-section-summary .wu-sum-blocked {
+  display: inline-block;
+  margin-left: 6px;
+  padding: 0 6px;
+  border-radius: 10px;
+  font-size: 0.72em;
+  font-weight: 600;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+  background: #fde2e4;
+  color: #9b1c1c;
+  vertical-align: 1px;
+}
+
+/* ── Bar colour categories ─────────────────────────────────────────────────── */
+
+/* Legend swatch for colour categories (rectangular, matches bar strip feel) */
+.legend-colour-swatch {
+  width: 16px;
+  height: 10px;
+  border-radius: 3px;
+  display: inline-block;
+  flex-shrink: 0;
+}
+
+/* "Manage" / "Add colour categories" button inline in the legend */
+.legend-manage-btn {
+  border: none;
+  background: transparent;
+  color: var(--accent, #6366f1);
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  padding: 2px 6px;
+  border-radius: 4px;
+}
+.legend-manage-btn:hover {
+  background: color-mix(in srgb, var(--accent, #6366f1) 12%, transparent);
+}
+
+/* Colour-by-category toggle */
+.gantt-colour-mode {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.gantt-colour-mode-label {
+  font-size: 11px;
+  color: var(--muted);
+  white-space: nowrap;
+}
+
+.gantt-colour-mode-select {
+  border: 1px solid var(--border);
+  background: var(--panel-soft);
+  color: var(--text);
+  border-radius: 8px;
+  padding: 4px 8px;
+  font-size: 12px;
+  cursor: pointer;
+}
+
+.gantt-colour-hint {
+  position: absolute;
+  bottom: calc(100% + 6px);
+  right: 0;
+  z-index: 5;
+  font-size: 11px;
+  color: var(--muted);
+  font-style: italic;
+  white-space: nowrap;
+}
+
+/* Category manager modal overlay */
+.gantt-cat-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.55);
+  z-index: 400;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.gantt-cat-modal {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  width: 420px;
+  max-width: 95vw;
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.4);
+  overflow: hidden;
+}
+
+.gantt-cat-modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 18px;
+  border-bottom: 1px solid var(--border);
+}
+
+.gantt-cat-modal-title {
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--text);
+}
+
+.gantt-cat-modal-close {
+  background: none;
+  border: none;
+  color: var(--muted);
+  font-size: 20px;
+  line-height: 1;
+  cursor: pointer;
+  padding: 0 4px;
+}
+.gantt-cat-modal-close:hover {
+  color: var(--text);
+}
+
+.gantt-cat-modal-body {
+  padding: 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.gantt-cat-modal-hint {
+  font-size: 13px;
+  color: var(--muted);
+}
+
+.gantt-cat-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.gantt-cat-list-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 10px;
+  background: var(--panel-soft);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+}
+
+.gantt-cat-swatch {
+  width: 16px;
+  height: 16px;
+  border-radius: 3px;
+  flex-shrink: 0;
+}
+
+.gantt-cat-name {
+  flex: 1;
+  font-size: 13px;
+  color: var(--text);
+}
+
+.gantt-cat-delete {
+  background: none;
+  border: none;
+  color: var(--muted);
+  font-size: 16px;
+  line-height: 1;
+  cursor: pointer;
+  padding: 0 4px;
+  border-radius: 3px;
+}
+.gantt-cat-delete:hover {
+  color: var(--danger, #ef4444);
+  background: color-mix(in srgb, var(--danger, #ef4444) 10%, transparent);
+}
+
+.gantt-cat-add-row {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.gantt-cat-colour-input {
+  width: 36px;
+  height: 34px;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 2px;
+  cursor: pointer;
+  background: var(--panel-soft);
+  flex-shrink: 0;
+}
+
+.gantt-cat-name-input {
+  flex: 1;
+  background: var(--panel-soft);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 7px 10px;
+  color: var(--text);
+  font-size: 13px;
+  outline: none;
+}
+.gantt-cat-name-input:focus {
+  border-color: var(--accent, #6366f1);
+}
+
+.gantt-cat-add-btn {
+  padding: 7px 14px;
+  background: var(--accent, #6366f1);
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  white-space: nowrap;
+}
+.gantt-cat-add-btn:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+.gantt-cat-add-btn:not(:disabled):hover {
+  filter: brightness(1.1);
+}
+
+/* Category assignment popover (right-click on bar) */
+.gantt-assign-popover {
+  position: fixed;
+  z-index: 500;
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+  min-width: 180px;
+  padding: 4px 0;
+}
+
+.gantt-assign-popover-title {
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--muted);
+  padding: 6px 12px 4px;
+}
+
+.gantt-assign-option {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  width: 100%;
+  padding: 7px 12px;
+  background: none;
+  border: none;
+  color: var(--text);
+  font-size: 13px;
+  cursor: pointer;
+  text-align: left;
+}
+.gantt-assign-option:hover,
+.gantt-assign-option.is-active {
+  background: var(--panel-soft);
+}
+.gantt-assign-option.is-active {
+  font-weight: 600;
+}
+
+.gantt-assign-swatch {
+  width: 12px;
+  height: 12px;
+  border-radius: 3px;
+  flex-shrink: 0;
+}
+
+.gantt-assign-sep {
+  border: none;
+  border-top: 1px solid var(--border);
+  margin: 4px 0;
+}
+
+.gantt-assign-option--remove {
+  color: var(--danger, #ef4444);
+}
+.gantt-assign-option--remove:hover {
+  background: color-mix(in srgb, var(--danger, #ef4444) 8%, transparent);
+}
+
+.gantt-assign-option--add {
+  color: var(--accent, #6366f1);
+}
+
+/* ── Custom bars ─────────────────────────────────────────────────────────────── */
+
+/* Custom bar in the swimlane — dashed outline, translucent fill.
+   Colour is driven by --cb-color (set as an inline style on the element so
+   per-bar colours work). Falls back to the default purple if unset. */
+.gantt-lane-bar--custom {
+  --cb-color: #a78bfa;
+  background: color-mix(in srgb, var(--cb-color) 18%, transparent);
+  outline: 2px dashed var(--cb-color);
+  color: var(--cb-color);
+  font-style: italic;
+  /* pointer-events intentionally NOT disabled: single-lane custom bars
+     participate in hover tooltips and dep-drag the same as fix-version bars. */
+}
+
+/* Full-height overlay for "all swimlanes" custom bars.
+   Positioned to match gantt-lane-inner's x-range (same formula as
+   .gantt--swimlane .gantt-dependency-layer). */
+.gantt-all-lanes-overlay {
+  position: absolute;
+  left: calc(var(--gantt-x-offset) + var(--gantt-label-width) + var(--gantt-gap) + var(--gantt-side) + 1px);
+  right: calc(var(--gantt-side) + 1px);
+  top: 0;
+  bottom: 0;
+  pointer-events: none;
+  /* Below dep arrows (z:4) so arrows still render on top, but above lane
+     bars (z:2) so the overlay visibly covers them. */
+  z-index: 3;
+  /* Bands are clamped to the track range horizontally (getPercent), so they
+     never exceed the overlay width — we can leave overflow visible so the
+     short-band name label can sit just above the band without being clipped. */
+  overflow: visible;
+}
+
+.gantt-all-lanes-bar {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  background: rgba(167, 139, 250, 0.18);
+  border-radius: 4px;
+  outline: 2px dashed rgba(167, 139, 250, 0.75);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+}
+
+.gantt-all-lanes-bar-label {
+  font-size: 11px;
+  font-weight: 600;
+  color: rgba(167, 139, 250, 0.9);
+  font-style: italic;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  padding: 0 4px;
+  max-width: 100%;
+}
+
+/* Narrow all-lanes band: drop the centre/ellipsis layout and lift the name
+   just above the band, centred on the bar and letting it overflow the band
+   width so it clears the first-row lane bar and stays readable. */
+.gantt-all-lanes-bar-label--short {
+  position: absolute;
+  bottom: calc(100% + 2px);
+  left: 50%;
+  transform: translateX(-50%);
+  overflow: visible;
+  text-overflow: clip;
+  max-width: none;
+}
+
+/* Custom bars card — form grid: name | swimlane | start | end | colour | add */
+.custom-bars-form {
+  display: grid;
+  grid-template-columns: 2fr 1.5fr auto auto auto auto;
+  gap: 8px;
+  align-items: center;
+  margin-bottom: 12px;
+}
+
+.custom-bars-form > input[type="text"] {
+  min-width: 120px;
+}
+
+.custom-bars-form select {
+  min-width: 140px;
+}
+
+.custom-bars-form button {
+  white-space: nowrap;
+}
+
+/* Size the themed date pickers to match the milestone card pickers. */
+.custom-bars-card .themed-date-picker {
+  width: 150px;
+  max-width: 150px;
+}
+
+/* Constrain Start/End columns in the edit table so the pickers don't stretch. */
+.custom-bars-card .custom-bars-table thead th:nth-child(3),
+.custom-bars-card .custom-bars-table tbody td:nth-child(3),
+.custom-bars-card .custom-bars-table thead th:nth-child(4),
+.custom-bars-card .custom-bars-table tbody td:nth-child(4) {
+  width: 170px;
+}
+
+/* Show-name toggle cell in the edit table */
+.custom-bar-show-name {
+  display: inline-flex;
+  align-items: center;
+  cursor: pointer;
+}
+
+/* Lane tag pill in the table */
+.custom-bar-lane-tag {
+  display: inline-flex;
+  align-items: center;
+  padding: 2px 8px;
+  border-radius: 999px;
+  font-size: 11px;
+  font-weight: 600;
+  background: rgba(167, 139, 250, 0.12);
+  color: #a78bfa;
+  border: 1px solid rgba(167, 139, 250, 0.3);
+}
+
+/* Screen-reader-only utility for visually hidden labels (WCAG). */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}

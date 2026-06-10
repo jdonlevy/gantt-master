@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Delivery Tracker – Release Notes v8</title>
+  <style>
+    :root {
+      --text: #0f172a;
+      --muted: #64748b;
+      --border: #e2e8f0;
+      --panel: #ffffff;
+      --accent: #2563eb;
+      --bg: #f8fafc;
+    }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      color: var(--text);
+      background: var(--bg);
+      margin: 0;
+      padding: 32px;
+    }
+    .container {
+      max-width: 1100px;
+      margin: 0 auto;
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 32px;
+      box-shadow: 0 6px 22px rgba(15, 23, 42, 0.08);
+    }
+    h1 { margin: 0 0 8px; font-size: 28px; }
+    h2 { margin-top: 28px; font-size: 20px; border-bottom: 1px solid var(--border); padding-bottom: 8px; }
+    p { color: var(--muted); line-height: 1.6; }
+    ul { margin: 8px 0 0 18px; }
+    li { margin: 6px 0; }
+    .tag {
+      display: inline-block;
+      padding: 2px 8px;
+      border-radius: 999px;
+      background: #e2e8f0;
+      color: #334155;
+      font-size: 12px;
+      margin-right: 6px;
+    }
+    .nav {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+      margin: 12px 0 6px;
+    }
+    .nav a {
+      color: var(--accent);
+      text-decoration: none;
+      font-size: 13px;
+      font-weight: 600;
+    }
+    .nav a:hover { text-decoration: underline; }
+    .footer {
+      margin-top: 32px;
+      font-size: 12px;
+      color: var(--muted);
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Delivery Tracker – Release Notes v8</h1>
+    <p><span class="tag">Release Date</span> Jun 5, 2026</p>
+
+    <div class="nav">
+      <a href="/release-notes">Release Notes Index</a>
+      <a href="/release-notes/v7">v7</a>
+      <a href="/release-notes/v6">v6</a>
+      <a href="/release-notes/v5">v5</a>
+      <a href="/release-notes/v4">v4</a>
+      <a href="/release-notes/v3">v3</a>
+      <a href="/release-notes/v2">v2</a>
+      <a href="/release-notes/v1">v1</a>
+    </div>
+
+    <h2>Summary</h2>
+    <p>
+      v8 adds an initiative grouping layer above swimlanes, flexible bar colouring on the
+      swimlane Gantt, and richer scoping for the Updates tab. The roadmap now loads almost
+      instantly when filters haven't changed, and a number of UI rough edges have been polished.
+    </p>
+
+    <h2>Initiative grouping</h2>
+    <ul>
+      <li>Group swimlanes (or fix versions) under named initiatives, shown as a coloured left spine.</li>
+      <li>Initiatives can be collapsed/expanded, and the folded state is remembered across reloads.</li>
+      <li>Toggle the whole grouping layer on or off — existing dashboards render unchanged until you opt in.</li>
+    </ul>
+
+    <h2>Swimlane bar colours</h2>
+    <ul>
+      <li>New “Colour bars by” control: RAG status, Project, Swimlane, Initiative, or Manual.</li>
+      <li>Manual mode lets you define named colour categories and assign them by right-clicking a bar.</li>
+      <li>Add custom bars to a swimlane with their own name, dates, and colour.</li>
+    </ul>
+
+    <h2>Updates tab</h2>
+    <ul>
+      <li>The Updates summary is scoped by its own fix-version selection, independent of the roadmap.</li>
+      <li>New “Date from / Date to” filter sets a custom released window (defaults to the last two weeks).</li>
+      <li>Collapsing the filters, milestones, or custom-bars sections no longer flags unsaved changes.</li>
+    </ul>
+
+    <h2>Performance &amp; polish</h2>
+    <ul>
+      <li>Roadmap loads instantly from a saved snapshot when filters are unchanged.</li>
+      <li>The active tab (Updates / Roadmap) is preserved across a page refresh.</li>
+      <li>Removed the sequential/concurrent dependency toggle — sequencing warnings are now always on.</li>
+      <li>Refined tab styling, the colour-mode hint, the Refresh button, and assorted spacing.</li>
+    </ul>
+
+    <div class="footer">Delivery Tracker – Release Notes v8</div>
+  </div>
+</body>
+</html>

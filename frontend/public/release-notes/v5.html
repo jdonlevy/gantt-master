@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Delivery Tracker – Release Notes v5</title>
+  <style>
+    :root {
+      --text: #0f172a;
+      --muted: #64748b;
+      --border: #e2e8f0;
+      --panel: #ffffff;
+      --accent: #2563eb;
+      --bg: #f8fafc;
+    }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      color: var(--text);
+      background: var(--bg);
+      margin: 0;
+      padding: 32px;
+    }
+    .container {
+      max-width: 1100px;
+      margin: 0 auto;
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 32px;
+      box-shadow: 0 6px 22px rgba(15, 23, 42, 0.08);
+    }
+    h1 { margin: 0 0 8px; font-size: 28px; }
+    h2 { margin-top: 28px; font-size: 20px; border-bottom: 1px solid var(--border); padding-bottom: 8px; }
+    h3 { margin-top: 20px; font-size: 16px; }
+    p { color: var(--muted); line-height: 1.6; }
+    ul { margin: 8px 0 0 18px; }
+    li { margin: 6px 0; }
+    .tag {
+      display: inline-block;
+      padding: 2px 8px;
+      border-radius: 999px;
+      background: #e2e8f0;
+      color: #334155;
+      font-size: 12px;
+      margin-right: 6px;
+    }
+    .note {
+      background: #f1f5f9;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 12px 14px;
+      font-size: 14px;
+      color: #334155;
+    }
+    .nav {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+      margin: 12px 0 6px;
+    }
+    .nav a {
+      color: var(--accent);
+      text-decoration: none;
+      font-size: 13px;
+      font-weight: 600;
+    }
+    .nav a:hover { text-decoration: underline; }
+    .footer {
+      margin-top: 32px;
+      font-size: 12px;
+      color: var(--muted);
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Delivery Tracker – Release Notes v5</h1>
+    <p><span class="tag">Release Date</span> Apr 17, 2026</p>
+
+    <div class="nav">
+      <a href="/release-notes">Release Notes Index</a>
+      <a href="/release-notes/v4">v4</a>
+      <a href="/release-notes/v3">v3</a>
+      <a href="/release-notes/v2">v2</a>
+      <a href="/release-notes/v1">v1</a>
+      <a href="#summary">Summary</a>
+      <a href="#features">Key Updates</a>
+      <a href="#usage">How to Use</a>
+      <a href="#tests">Test Coverage</a>
+    </div>
+
+    <h2 id="summary">Summary</h2>
+    <p>
+      v5 tightens dashboard-scoped planning data and improves swimlane readability.
+      Milestones and UAT/Live windows now save per dashboard, while schedule-based
+      risk status and progress labels are visible in swimlane view. The Gantt header
+      and legends move above the timeline with a compact horizontal layout.
+    </p>
+
+    <h2 id="features">Key Updates</h2>
+    <h3>UX Enhancements</h3>
+    <ul>
+      <li>Gantt header and legend are now positioned above the timeline.</li>
+      <li>Legend switches to a horizontal layout to reduce vertical whitespace.</li>
+      <li>Swimlane bars render behind progress pills for cleaner readability.</li>
+    </ul>
+
+    <h3>Status & Risk Visibility</h3>
+    <ul>
+      <li>Schedule-based status calculation now flags items as On track, At risk, or Overdue.</li>
+      <li>Progress percentages appear in swimlane labels.</li>
+      <li>Status colors are consistent between Standard and Swimlane views.</li>
+    </ul>
+
+    <h3>Dashboard-Scoped Planning Data</h3>
+    <ul>
+      <li>Milestones are now saved per dashboard (with optional project scoping retained).</li>
+      <li>UAT and Go Live windows are scoped per dashboard.</li>
+      <li>Swimlane view now renders UAT and Live markers for fix versions.</li>
+    </ul>
+
+    <h2 id="usage">How to Use</h2>
+    <ul>
+      <li>Set UAT/Live windows on a dashboard and they will only appear on that dashboard.</li>
+      <li>Use Swimlane view for per-lane progress labels and schedule risk highlighting.</li>
+    </ul>
+
+    <h2 id="tests">Test Coverage</h2>
+    <ul>
+      <li>Backend tests updated for dashboard-scoped milestones and overrides.</li>
+      <li>Frontend tests updated for dashboard-aware roadmap fetches.</li>
+    </ul>
+
+    <div class="note">
+      If a milestone or UAT/Live window was created before v5, re-save it in the
+      dashboard to associate it with the current dashboard scope.
+    </div>
+
+    <div class="footer">Delivery Tracker – Release Notes v5</div>
+  </div>
+</body>
+</html>

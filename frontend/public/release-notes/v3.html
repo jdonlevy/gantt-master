@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Delivery Tracker – Release Notes v3</title>
+  <style>
+    :root {
+      --text: #0f172a;
+      --muted: #64748b;
+      --border: #e2e8f0;
+      --panel: #ffffff;
+      --accent: #2563eb;
+      --bg: #f8fafc;
+    }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      color: var(--text);
+      background: var(--bg);
+      margin: 0;
+      padding: 32px;
+    }
+    .container {
+      max-width: 1100px;
+      margin: 0 auto;
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 32px;
+      box-shadow: 0 6px 22px rgba(15, 23, 42, 0.08);
+    }
+    h1 { margin: 0 0 8px; font-size: 28px; }
+    h2 { margin-top: 28px; font-size: 20px; border-bottom: 1px solid var(--border); padding-bottom: 8px; }
+    h3 { margin-top: 20px; font-size: 16px; }
+    p { color: var(--muted); line-height: 1.6; }
+    ul { margin: 8px 0 0 18px; }
+    li { margin: 6px 0; }
+    .tag {
+      display: inline-block;
+      padding: 2px 8px;
+      border-radius: 999px;
+      background: #e2e8f0;
+      color: #334155;
+      font-size: 12px;
+      margin-right: 6px;
+    }
+    .note {
+      background: #f1f5f9;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 12px 14px;
+      font-size: 14px;
+      color: #334155;
+    }
+    .nav {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+      margin: 12px 0 6px;
+    }
+    .nav a {
+      color: var(--accent);
+      text-decoration: none;
+      font-size: 13px;
+      font-weight: 600;
+    }
+    .nav a:hover { text-decoration: underline; }
+    .footer {
+      margin-top: 32px;
+      font-size: 12px;
+      color: var(--muted);
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Delivery Tracker – Release Notes v3</h1>
+    <p><span class="tag">Release Date</span> Mar 20, 2026</p>
+
+    <div class="nav">
+      <a href="/release-notes">Release Notes Index</a>
+      <a href="/release-notes/v2">v2</a>
+      <a href="/release-notes/v1">v1</a>
+      <a href="#summary">Summary</a>
+      <a href="#updates">Updates</a>
+      <a href="#notes">Notes</a>
+    </div>
+
+    <h2 id="summary">Summary</h2>
+    <p>
+      v3 rolls forward the latest mainline changes with layout and styling tweaks,
+      plus updated test coverage and release notes navigation.
+    </p>
+
+    <h2 id="updates">Updates</h2>
+    <h3>UI & Layout</h3>
+    <ul>
+      <li>Dashboard layout adjustments merged from main.</li>
+      <li>Gantt styling tweaks and alignment updates carried forward.</li>
+    </ul>
+
+    <h3>Testing</h3>
+    <ul>
+      <li>Release notes E2E test updated for latest version.</li>
+      <li>Gantt link unit tests updated with URL expectations.</li>
+    </ul>
+
+    <h2 id="notes">Notes</h2>
+    <div class="note">
+      This release maintains v2 functionality and merges upstream changes from main.
+      For prior feature details, see v2 and v1 release notes.
+    </div>
+
+    <div class="footer">Delivery Tracker – Release Notes v3</div>
+  </div>
+</body>
+</html>

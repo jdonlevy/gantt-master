@@ -1,0 +1,524 @@
+/* PresentationView — full-screen slide view for the fortnightly update.
+   "Warm paper / power-blue" surface by default, with a deep-ink dark variant
+   that follows the app's theme (body[data-theme='dark']). Visual language
+   mirrors the AI-team presentations sandbox. Class prefix: .pv- (kept distinct
+   from the .wu- panel styles). */
+.pv-root {
+  --pv-paper: #faf9f5;
+  --pv-sheet: #ffffff;
+  --pv-warm: #f6f1e6;
+  --pv-hi: #eef1fe;
+  --pv-ink: #0a0b08;
+  --pv-ink-2: #2e2e2e;
+  --pv-ink-3: #8e8e8e;
+  --pv-ink-4: #c1c1bd;
+  --pv-rule: #e6e8ee;
+  --pv-power: #0046c7;
+  --pv-power-deep: #003aa6;
+  --pv-led: #ff5c00;
+  --pv-pink: #ff024e;
+  --pv-green: #157a3a;
+  --pv-purple: #7b2ff7;
+  --pv-cyan: #0a8fa8;
+  --pv-amber: #d98a00;
+
+  position: fixed;
+  inset: 0;
+  z-index: 9000;
+  display: flex;
+  flex-direction: column;
+  background: var(--pv-paper);
+  color: var(--pv-ink);
+  font-family: "Inter", system-ui, -apple-system, sans-serif;
+  font-feature-settings: "ss01", "cv11", "tnum";
+  -webkit-font-smoothing: antialiased;
+}
+.pv-root *, .pv-root *::before, .pv-root *::after { box-sizing: border-box; }
+
+/* Dark variant — the overlay is portaled onto <body>, so it inherits the
+   app's data-theme attribute. Only the palette tokens change; every rule
+   below keeps using the same var() names. */
+body[data-theme='dark'] .pv-root {
+  --pv-paper: #0b1120;
+  --pv-sheet: #111a2e;
+  --pv-warm: #1a2336;
+  --pv-hi: #16223f;
+  --pv-ink: #f8fafc;
+  --pv-ink-2: #cbd5e1;
+  --pv-ink-3: #8b97ab;
+  --pv-ink-4: #4a5568;
+  --pv-rule: #25304a;
+  --pv-power: #5b8cff;
+  --pv-power-deep: #3f6fe0;
+  --pv-led: #ff7a33;
+  --pv-pink: #ff3d6e;
+  --pv-green: #36c46b;
+  --pv-purple: #b48bff;
+  --pv-cyan: #2dd4bf;
+  --pv-amber: #fbbf24;
+}
+
+.pv-mono { font-family: "Geist Mono", ui-monospace, "SFMono-Regular", monospace; }
+
+/* ── Top bar ── */
+.pv-topbar {
+  flex: 0 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 56px;
+  padding: 0 28px;
+  border-bottom: 1px solid var(--pv-rule);
+}
+.pv-brand { font-size: 13px; font-weight: 600; letter-spacing: -0.01em; }
+.pv-brand .pv-dot {
+  display: inline-block; width: 7px; height: 7px; border-radius: 999px;
+  background: var(--pv-power); margin-right: 8px; vertical-align: middle;
+}
+.pv-topbar-right { display: flex; align-items: center; gap: 14px; }
+.pv-counter {
+  font-family: "Geist Mono", ui-monospace, monospace;
+  font-size: 11px; letter-spacing: 0.14em; color: var(--pv-ink-3);
+  text-transform: uppercase;
+}
+.pv-counter b { color: var(--pv-ink); font-variant-numeric: tabular-nums; }
+
+/* ── Buttons ── */
+.pv-btn {
+  background: var(--pv-ink); color: var(--pv-sheet); border: 0;
+  border-radius: 999px; padding: 8px 16px;
+  font-family: inherit; font-size: 12.5px; font-weight: 500; cursor: pointer;
+  transition: background 120ms ease, color 120ms ease, border-color 120ms ease;
+}
+.pv-btn--ghost { background: transparent; color: var(--pv-ink); border: 1px solid var(--pv-rule); }
+.pv-btn--ghost:hover { border-color: var(--pv-ink); }
+.pv-btn--ghost.is-active { background: var(--pv-ink); color: var(--pv-sheet); border-color: var(--pv-ink); }
+.pv-btn--round {
+  width: 40px; height: 40px; padding: 0; border-radius: 999px;
+  display: inline-flex; align-items: center; justify-content: center;
+  font-size: 18px; background: var(--pv-sheet); color: var(--pv-ink);
+  border: 1px solid var(--pv-rule); cursor: pointer;
+}
+.pv-btn--round:hover { border-color: var(--pv-ink); }
+.pv-btn--round:disabled { opacity: 0.35; cursor: not-allowed; border-color: var(--pv-rule); }
+
+/* ── Slide viewport ── */
+.pv-viewport { flex: 1 1 auto; position: relative; overflow: hidden; }
+.pv-slide {
+  position: absolute; inset: 0;
+  padding: 52px 64px 36px;
+  overflow: auto;
+  animation: pv-fade 240ms ease;
+}
+@keyframes pv-fade { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
+/* Direction-aware enter: forward slides drift in from the right, back from the
+   left, so navigation has a sense of travel. */
+.pv-slide[data-dir='fwd'] { animation: pv-slide-fwd 360ms cubic-bezier(0.22, 1, 0.36, 1); }
+.pv-slide[data-dir='back'] { animation: pv-slide-back 360ms cubic-bezier(0.22, 1, 0.36, 1); }
+@keyframes pv-slide-fwd { from { opacity: 0; transform: translateX(48px); } to { opacity: 1; transform: none; } }
+@keyframes pv-slide-back { from { opacity: 0; transform: translateX(-48px); } to { opacity: 1; transform: none; } }
+@media (prefers-reduced-motion: reduce) {
+  .pv-slide, .pv-slide[data-dir='fwd'], .pv-slide[data-dir='back'] { animation: pv-fade 160ms ease; }
+}
+.pv-slide-inner { max-width: 1280px; margin: 0 auto; }
+/* The title slide reads better as a tighter measure than the wide section grid. */
+.pv-title-slide .pv-slide-inner { max-width: 1000px; }
+
+.pv-eyebrow {
+  font-family: "Geist Mono", ui-monospace, monospace;
+  font-size: 11px; line-height: 1; letter-spacing: 0.18em;
+  text-transform: uppercase; color: var(--pv-ink-3);
+}
+
+/* Title slide */
+/* isolate so the inner z-index:1 (used to sit above the decorative wash/mark)
+   stays contained and can't paint over the Overview overlay. */
+.pv-title-slide { position: relative; overflow: hidden; isolation: isolate; }
+.pv-title-slide .pv-slide-inner { padding-top: 12vh; position: relative; z-index: 1; }
+
+/* Decorative wash — a soft power-blue glow bleeding in from the corners, only
+   on the start slide, to lift it above the plain section slides. */
+.pv-title-wash {
+  position: absolute; inset: 0; pointer-events: none; z-index: 0;
+  background:
+    radial-gradient(620px 420px at 88% -8%, color-mix(in srgb, var(--pv-power) 16%, transparent), transparent 70%),
+    radial-gradient(540px 380px at -6% 108%, color-mix(in srgb, var(--pv-led) 12%, transparent), transparent 70%);
+}
+/* Oversized project monogram bleeding off the right edge. */
+.pv-title-mark {
+  position: absolute; right: 4vw; bottom: 6vh; z-index: 0; pointer-events: none;
+  font-weight: 700; font-size: clamp(120px, 20vw, 320px); line-height: 0.8;
+  letter-spacing: -0.05em; text-transform: uppercase;
+  color: var(--pv-power); opacity: 0.05; user-select: none;
+}
+
+.pv-title-eyebrow { display: inline-flex; align-items: center; gap: 12px; }
+.pv-eyebrow-rule {
+  display: inline-block; width: 34px; height: 2px; border-radius: 2px;
+  background: var(--pv-power);
+}
+.pv-title {
+  font-size: clamp(40px, 6vw, 68px); font-weight: 600;
+  letter-spacing: -0.035em; line-height: 1; margin: 22px 0 20px;
+}
+.pv-title-accent {
+  background: linear-gradient(96deg, var(--pv-power), var(--pv-led));
+  -webkit-background-clip: text; background-clip: text; color: transparent;
+}
+.pv-title-sub { font-size: 17px; color: var(--pv-ink-2); line-height: 1.5; max-width: 640px; margin: 0; }
+.pv-title-meta {
+  margin-top: 40px; padding-top: 26px; border-top: 1px solid var(--pv-rule);
+  display: flex; gap: 48px; flex-wrap: wrap;
+}
+.pv-meta-k {
+  display: inline-flex; align-items: center; gap: 7px;
+  font-family: "Geist Mono", ui-monospace, monospace; font-size: 10px;
+  letter-spacing: 0.18em; text-transform: uppercase; color: var(--pv-ink-3);
+}
+.pv-meta-dot { width: 8px; height: 8px; border-radius: 999px; }
+.pv-meta-dot--released { background: var(--pv-green); }
+.pv-meta-dot--active { background: var(--pv-power); }
+.pv-meta-v { font-size: 28px; font-weight: 600; letter-spacing: -0.02em; margin-top: 8px; }
+
+/* Staggered entrance for the start slide so it feels deliberate, not static. */
+.pv-title-slide .pv-eyebrow,
+.pv-title-slide .pv-title,
+.pv-title-slide .pv-title-sub,
+.pv-title-slide .pv-title-meta {
+  opacity: 0; animation: pv-rise 520ms cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+.pv-title-slide .pv-eyebrow { animation-delay: 60ms; }
+.pv-title-slide .pv-title { animation-delay: 150ms; }
+.pv-title-slide .pv-title-sub { animation-delay: 260ms; }
+.pv-title-slide .pv-title-meta { animation-delay: 360ms; }
+@keyframes pv-rise { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: none; } }
+@media (prefers-reduced-motion: reduce) {
+  .pv-title-slide .pv-eyebrow,
+  .pv-title-slide .pv-title,
+  .pv-title-slide .pv-title-sub,
+  .pv-title-slide .pv-title-meta { animation: none; opacity: 1; }
+}
+
+/* Mirror the title-slide stagger on section/rich-text slides: the kicker chips
+ * fan in first, then the heading, so each slide entrance feels composed. */
+.pv-slide:not(.pv-title-slide) .pv-kicker > *,
+.pv-slide:not(.pv-title-slide) .pv-slide-title {
+  opacity: 0; animation: pv-rise 460ms cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+.pv-slide:not(.pv-title-slide) .pv-kicker > *:nth-child(1) { animation-delay: 80ms; }
+.pv-slide:not(.pv-title-slide) .pv-kicker > *:nth-child(2) { animation-delay: 150ms; }
+.pv-slide:not(.pv-title-slide) .pv-kicker > *:nth-child(3) { animation-delay: 220ms; }
+.pv-slide:not(.pv-title-slide) .pv-slide-title { animation-delay: 300ms; }
+@media (prefers-reduced-motion: reduce) {
+  .pv-slide:not(.pv-title-slide) .pv-kicker > *,
+  .pv-slide:not(.pv-title-slide) .pv-slide-title { animation: none; opacity: 1; }
+}
+
+/* Section slide */
+.pv-kicker { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; margin-bottom: 14px; }
+.pv-chip {
+  display: inline-flex; align-items: center;
+  font-family: "Geist Mono", ui-monospace, monospace;
+  font-size: 10px; letter-spacing: 0.14em; text-transform: uppercase;
+  border-radius: 999px; padding: 5px 11px; border: 1px solid var(--pv-rule);
+  background: var(--pv-hi); color: var(--pv-power-deep);
+}
+.pv-pill {
+  display: inline-flex; align-items: center; gap: 7px;
+  font-family: "Geist Mono", ui-monospace, monospace;
+  font-size: 10px; letter-spacing: 0.12em; text-transform: uppercase;
+  border-radius: 999px; padding: 5px 11px 5px 9px; color: var(--pv-sheet);
+}
+.pv-pill .pv-led { width: 7px; height: 7px; border-radius: 999px; background: rgba(255,255,255,0.9); }
+.pv-pill--today { background: var(--pv-led); }
+.pv-pill--prog  { background: var(--pv-power); }
+.pv-pill--released { background: var(--pv-green); }
+.pv-ticket {
+  margin-left: auto;
+  font-family: "Geist Mono", ui-monospace, monospace; font-size: 11px;
+  color: var(--pv-ink-3); letter-spacing: 0.04em;
+}
+.pv-ticket b { color: var(--pv-ink); font-variant-numeric: tabular-nums; }
+
+.pv-slide-title {
+  font-size: clamp(28px, 4vw, 42px); font-weight: 600; letter-spacing: -0.03em;
+  line-height: 1.05; margin: 0 0 8px;
+}
+.pv-slide-title a { color: inherit; text-decoration: none; display: inline-flex; align-items: baseline; gap: 10px; }
+.pv-slide-title a:hover { color: var(--pv-power); }
+.pv-link-icon { width: 16px; height: 16px; color: var(--pv-ink-3); flex: 0 0 auto; }
+
+.pv-dates { display: flex; gap: 24px; margin: 16px 0 22px; flex-wrap: wrap; }
+.pv-date-item { display: flex; align-items: center; gap: 8px; font-size: 13px; color: var(--pv-ink-2); }
+.pv-date-dot { width: 8px; height: 8px; border-radius: 999px; }
+.pv-date-dot--uat { background: var(--pv-power); }
+.pv-date-dot--target { background: var(--pv-led); }
+.pv-date-k {
+  font-family: "Geist Mono", ui-monospace, monospace; font-size: 10px;
+  letter-spacing: 0.12em; text-transform: uppercase; color: var(--pv-ink-3);
+}
+.pv-date-v.is-urgent { color: var(--pv-pink); font-weight: 600; }
+.pv-note {
+  font-size: 12.5px; color: var(--pv-ink-3); margin: -8px 0 18px;
+  padding: 8px 12px; background: var(--pv-warm); border-radius: 8px; border: 1px solid var(--pv-rule);
+}
+.pv-note strong { color: var(--pv-ink-2); }
+
+/* Per-slide delivery progress bar (derived from the section's ticket counts). */
+.pv-progress { margin: 4px 0 22px; max-width: 920px; }
+.pv-progress-head {
+  display: flex; align-items: baseline; justify-content: space-between;
+  gap: 12px; margin-bottom: 8px;
+}
+.pv-progress-label {
+  font-family: "Geist Mono", ui-monospace, monospace; font-size: 10px;
+  letter-spacing: 0.14em; text-transform: uppercase; color: var(--pv-ink-3);
+}
+.pv-progress-stat { font-size: 13px; color: var(--pv-ink-2); }
+.pv-progress-stat b { color: var(--pv-ink); font-variant-numeric: tabular-nums; }
+.pv-progress-track {
+  height: 8px; border-radius: 999px; background: var(--pv-warm);
+  border: 1px solid var(--pv-rule); overflow: hidden;
+}
+.pv-progress-fill {
+  height: 100%; border-radius: 999px;
+  background: linear-gradient(90deg, var(--pv-power), var(--pv-power-deep));
+  width: var(--w, 0%);
+  /* Grow from empty to the target width each time the slide enters. */
+  animation: pv-grow 1080ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+@keyframes pv-grow { from { width: 0%; } }
+@media (prefers-reduced-motion: reduce) { .pv-progress-fill { animation: none; } }
+
+.pv-summary { font-size: 18px; line-height: 1.55; color: var(--pv-ink-2); margin: 0 0 26px; max-width: 920px; }
+.pv-summary p { margin: 0 0 10px; }
+.pv-summary p:last-child { margin-bottom: 0; }
+.pv-summary ul, .pv-summary ol { margin: 8px 0; padding-left: 22px; }
+.pv-summary li { margin: 3px 0; }
+.pv-summary a { color: var(--pv-power); text-decoration: underline; text-underline-offset: 2px; }
+.pv-summary strong, .pv-summary b { color: var(--pv-ink); }
+
+/* Roadmap slide — the embedded Gantt fills the remaining height and scrolls
+   inside its own pane (the slide itself never scrolls, so the page-level
+   scrollbar can't overlap the chart). REVERT: remove this block with the slide. */
+.pv-slide--roadmap { overflow: hidden; padding-bottom: 24px; }
+.pv-slide--roadmap .pv-slide-inner { height: 100%; display: flex; flex-direction: column; }
+.pv-roadmap {
+  flex: 1 1 auto; min-height: 0; margin-top: 12px;
+  overflow: auto; overscroll-behavior: contain; scrollbar-gutter: stable;
+}
+/* Thin, paper-toned scrollbars so the chart's scroll affordance reads as part
+   of the deck rather than the OS chrome. */
+.pv-roadmap { scrollbar-width: thin; scrollbar-color: var(--pv-ink-4) transparent; }
+.pv-roadmap::-webkit-scrollbar { width: 10px; height: 10px; }
+.pv-roadmap::-webkit-scrollbar-thumb {
+  background: var(--pv-ink-4); border-radius: 999px;
+  border: 3px solid transparent; background-clip: padding-box;
+}
+.pv-roadmap::-webkit-scrollbar-thumb:hover { background: var(--pv-ink-3); background-clip: padding-box; }
+.pv-roadmap::-webkit-scrollbar-track { background: transparent; }
+/* Drop the embedded chart's own card framing so it sits flush on the slide. */
+.pv-roadmap .card { box-shadow: none; border: 0; background: transparent; padding: 0; }
+/* Native feel (1): hide the chart's interactive chrome on the slide — the deck
+   shows a clean, read-only roadmap. The dashboard keeps the full toolbar. */
+.pv-roadmap .gantt-toolbar { display: none; }
+/* Native feel (5): rise the chart in just after the heading on slide enter. */
+.pv-slide--roadmap .pv-roadmap {
+  opacity: 0; animation: pv-rise 560ms cubic-bezier(0.22, 1, 0.36, 1) forwards;
+  animation-delay: 360ms;
+}
+@media (prefers-reduced-motion: reduce) {
+  .pv-slide--roadmap .pv-roadmap { animation: none; opacity: 1; }
+}
+/* The Gantt's hover tooltip is portalled to document.body (z-index 1000) — a
+   sibling of this overlay (z-index 9000), so it would paint behind the deck.
+   While presenting, lift it above the overlay so bar hovers work on the slide. */
+body[data-pv-presenting] .gantt-bar-tooltip { z-index: 9500; }
+
+/* Rich-text panel slides — reuse the summary type scale so notes read like
+   the rest of the deck. */
+.pv-rich { font-size: 18px; line-height: 1.55; color: var(--pv-ink-2); max-width: 920px; }
+.pv-rich p { margin: 0 0 12px; }
+.pv-rich p:last-child { margin-bottom: 0; }
+.pv-rich h1, .pv-rich h2, .pv-rich h3 { color: var(--pv-ink); line-height: 1.25; margin: 18px 0 8px; }
+.pv-rich h1 { font-size: 26px; }
+.pv-rich h2 { font-size: 22px; }
+.pv-rich h3 { font-size: 18px; }
+.pv-rich ul, .pv-rich ol { margin: 8px 0; padding-left: 22px; }
+.pv-rich li { margin: 4px 0; }
+.pv-rich a { color: var(--pv-power); text-decoration: underline; text-underline-offset: 2px; }
+.pv-rich strong, .pv-rich b { color: var(--pv-ink); }
+.pv-rich img { max-width: 100%; height: auto; border-radius: 8px; cursor: zoom-in; }
+.pv-summary img { max-width: 100%; height: auto; border-radius: 8px; cursor: zoom-in; }
+/* Images lifted onto the right-hand rail (mirrors the section pie placement). */
+.pv-rich-media { display: flex; flex-direction: column; gap: 14px; }
+.pv-rich-media-btn {
+  display: block; width: 100%; padding: 0; border: 0; background: none;
+  cursor: zoom-in; border-radius: 12px;
+  transition: transform 140ms ease, box-shadow 140ms ease;
+}
+.pv-rich-media-btn:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(0,0,0,0.14); }
+.pv-rich-media-btn img {
+  display: block; width: 100%; height: auto;
+  border-radius: 12px; border: 1px solid var(--pv-rule);
+}
+.pv-rich blockquote {
+  margin: 12px 0; padding: 4px 0 4px 16px; border-left: 3px solid var(--pv-rule);
+  color: var(--pv-ink-3);
+}
+.pv-rich code {
+  font-family: "Geist Mono", ui-monospace, monospace; font-size: 0.9em;
+  background: var(--pv-warm); padding: 1px 5px; border-radius: 4px;
+}
+
+/* Section body — landscape two-column layout: prose on the left, the status
+   donut parked in a side rail on the right, alongside the text. Collapses to a
+   single column on narrow viewports. */
+.pv-section-body {
+  display: grid; grid-template-columns: minmax(0, 1fr) 300px; gap: 44px; align-items: start;
+}
+@media (max-width: 980px) { .pv-section-body { grid-template-columns: 1fr; gap: 28px; } }
+/* Notes give their images a wider rail than the section pie — charts/screenshots
+   need the room (and can be clicked to zoom full-screen). */
+.pv-slide--rich .pv-section-body { grid-template-columns: minmax(0, 1fr) 440px; }
+@media (max-width: 980px) { .pv-slide--rich .pv-section-body { grid-template-columns: 1fr; } }
+.pv-section-main { min-width: 0; }
+.pv-section-side {
+  background: transparent; border: 0; border-radius: 0;
+  padding: 0; position: sticky; top: 0;
+}
+
+/* Status pie — replaces the per-ticket sub-section breakdown with a donut
+   showing how the section's tickets are distributed across status buckets. */
+.pv-pie { display: flex; flex-direction: column; align-items: center; gap: 18px; }
+.pv-pie-svg { width: 184px; height: 184px; flex: 0 0 auto; }
+.pv-pie-arc {
+  transition: opacity 360ms ease; cursor: pointer;
+  /* Sweep each arc clockwise from nothing to its slice length, staggered via
+     an inline animation-delay, so the donut draws itself on slide enter. */
+  animation: pv-pie-draw 820ms cubic-bezier(0.22, 1, 0.36, 1) backwards;
+}
+@keyframes pv-pie-draw { from { stroke-dasharray: 0 var(--c); } }
+@media (prefers-reduced-motion: reduce) { .pv-pie-arc { animation: none; } }
+.pv-pie-num { font-size: 40px; font-weight: 600; fill: var(--pv-ink); font-variant-numeric: tabular-nums; }
+.pv-pie-cap {
+  font-family: "Geist Mono", ui-monospace, monospace; font-size: 10px;
+  letter-spacing: 0.16em; text-transform: uppercase; fill: var(--pv-ink-3);
+}
+.pv-pie-legend { list-style: none; margin: 0; padding: 0; display: grid; gap: 9px; width: 100%; }
+.pv-pie-key {
+  display: flex; align-items: center; gap: 10px; font-size: 13.5px; color: var(--pv-ink-2);
+  padding: 4px 6px; margin: -4px -6px; border-radius: 8px; cursor: default;
+  transition: background 360ms ease, color 360ms ease;
+}
+.pv-pie-key.is-active { background: var(--pv-hi); color: var(--pv-ink); }
+.pv-pie-swatch { width: 12px; height: 12px; border-radius: 4px; flex: 0 0 auto; }
+.pv-pie-key-label { flex: 1 1 auto; }
+.pv-pie-key-val { font-variant-numeric: tabular-nums; font-weight: 600; color: var(--pv-ink); }
+
+.pv-empty {
+  margin-top: 12vh; text-align: center; color: var(--pv-ink-3); font-size: 15px;
+}
+
+/* ── Footer nav ── */
+.pv-footnav {
+  flex: 0 0 auto; height: 64px; padding: 0 28px;
+  display: flex; align-items: center; justify-content: space-between;
+  border-top: 1px solid var(--pv-rule); background: var(--pv-sheet);
+}
+.pv-dots { display: flex; gap: 7px; flex-wrap: wrap; max-width: 60%; }
+.pv-dot {
+  width: 8px; height: 8px; border-radius: 999px; background: var(--pv-ink-4);
+  border: 0; padding: 0; cursor: pointer; transition: background 120ms ease, transform 120ms ease;
+}
+.pv-dot.is-active { background: var(--pv-ink); transform: scale(1.25); }
+.pv-hint {
+  font-family: "Geist Mono", ui-monospace, monospace; font-size: 10px;
+  letter-spacing: 0.12em; text-transform: uppercase; color: var(--pv-ink-3);
+}
+.pv-nav-pair { display: flex; gap: 10px; }
+
+/* ── Progress ribbon ── */
+/* A hairline across the very bottom of the deck whose fill tracks how far
+ * through the slides the presenter is. Sits below the footer nav. */
+.pv-ribbon { flex: 0 0 auto; height: 3px; background: var(--pv-rule); }
+.pv-ribbon-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--pv-power), var(--pv-led));
+  transition: width 360ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+@media (prefers-reduced-motion: reduce) { .pv-ribbon-fill { transition: none; } }
+
+/* ── Overview / reorder ── */
+.pv-overview { position: absolute; inset: 0; z-index: 5; background: var(--pv-paper); padding: 36px 48px; overflow: auto; }
+.pv-overview-head { display: flex; align-items: baseline; justify-content: space-between; margin-bottom: 4px; }
+.pv-overview-title { font-size: 26px; font-weight: 600; letter-spacing: -0.025em; margin: 0; }
+.pv-overview-hint { font-size: 13px; color: var(--pv-ink-3); margin: 4px 0 24px; }
+.pv-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 18px; }
+@media (max-width: 900px) { .pv-grid { grid-template-columns: repeat(2, 1fr); } }
+.pv-card {
+  background: var(--pv-sheet); border: 1px solid var(--pv-rule); border-radius: 16px;
+  overflow: hidden; cursor: grab;
+  transition: border-color 120ms ease, transform 120ms ease, box-shadow 120ms ease;
+}
+.pv-card:hover { border-color: var(--pv-ink); transform: translateY(-1px); }
+.pv-card.is-dragging { opacity: 0.4; }
+.pv-card.is-drop-target { border-color: var(--pv-power); box-shadow: 0 0 0 2px var(--pv-hi); }
+.pv-card-thumb {
+  aspect-ratio: 16 / 9; background: var(--pv-warm); border-bottom: 1px solid var(--pv-rule);
+  padding: 16px 18px; display: flex; flex-direction: column; gap: 8px; position: relative;
+}
+.pv-card-num {
+  position: absolute; top: 12px; right: 14px;
+  font-family: "Geist Mono", ui-monospace, monospace; font-size: 11px; color: var(--pv-ink-4);
+  font-variant-numeric: tabular-nums;
+}
+.pv-card-eyebrow {
+  font-family: "Geist Mono", ui-monospace, monospace; font-size: 9px;
+  letter-spacing: 0.16em; text-transform: uppercase; color: var(--pv-ink-3);
+}
+.pv-card-name { font-size: 16px; font-weight: 600; letter-spacing: -0.02em; line-height: 1.2; }
+.pv-card-excerpt {
+  font-size: 12px; line-height: 1.4; color: var(--pv-ink-3); margin-top: 2px;
+  display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden;
+}
+.pv-card-foot {
+  display: flex; align-items: center; justify-content: space-between; gap: 8px; padding: 10px 14px;
+  font-family: "Geist Mono", ui-monospace, monospace; font-size: 10px; color: var(--pv-ink-3);
+  letter-spacing: 0.06em; text-transform: uppercase;
+}
+.pv-card-foot-drag { display: inline-flex; align-items: center; gap: 8px; }
+.pv-card-handle { color: var(--pv-ink-4); font-size: 14px; }
+.pv-card-hide {
+  font-family: inherit; font-size: 10px; letter-spacing: 0.06em; text-transform: uppercase;
+  color: var(--pv-ink-3); background: transparent; border: 1px solid var(--pv-rule);
+  border-radius: 6px; padding: 3px 8px; cursor: pointer;
+  transition: border-color 120ms ease, color 120ms ease;
+}
+.pv-card-hide:hover { border-color: var(--pv-power); color: var(--pv-ink); }
+
+/* Hidden slides stay on the Overview (so they can be restored) but read as
+   muted and excluded from the live deck numbering. */
+.pv-card.is-hidden { opacity: 0.5; }
+.pv-card.is-hidden .pv-card-thumb { filter: grayscale(0.6); }
+
+/* ── Image zoom (click a note image to view it full-screen) ── */
+.pv-zoom {
+  position: absolute; inset: 0; z-index: 20;
+  display: flex; align-items: center; justify-content: center;
+  padding: 48px; background: rgba(8, 11, 20, 0.82);
+  cursor: zoom-out; animation: pv-fade 160ms ease;
+}
+.pv-zoom-img {
+  max-width: 100%; max-height: 100%; object-fit: contain;
+  border-radius: 12px; box-shadow: 0 24px 80px rgba(0, 0, 0, 0.5); cursor: default;
+}
+.pv-zoom-close {
+  position: absolute; top: 18px; right: 22px;
+  width: 40px; height: 40px; border-radius: 999px;
+  display: inline-flex; align-items: center; justify-content: center;
+  font-size: 24px; line-height: 1; color: #fff;
+  background: rgba(255, 255, 255, 0.12); border: 1px solid rgba(255, 255, 255, 0.25);
+  cursor: pointer;
+}
+.pv-zoom-close:hover { background: rgba(255, 255, 255, 0.22); }

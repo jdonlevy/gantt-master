@@ -1,0 +1,59 @@
+services:
+  db:
+    image: postgres:16
+    container_name: delivery-tracker-postgres
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: delivery_tracker
+    ports:
+      - "5433:5432"
+    volumes:
+      - delivery-tracker-pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  backend:
+    build:
+      context: .
+      dockerfile: Dockerfile.backend
+      target: development
+    container_name: delivery-tracker-backend
+    environment:
+      DT_DATABASE_URL: postgresql+asyncpg://postgres:postgres@db:5432/delivery_tracker
+      DT_CORS_ORIGINS: http://localhost:3000
+      DT_UI_BASE_URL: http://localhost:3000
+      DT_SESSION_SECRET: change-me
+      DT_JIRA_OAUTH_CLIENT_ID: ${DT_JIRA_OAUTH_CLIENT_ID:-}
+      DT_JIRA_OAUTH_CLIENT_SECRET: ${DT_JIRA_OAUTH_CLIENT_SECRET:-}
+      DT_JIRA_OAUTH_REDIRECT_URI: ${DT_JIRA_OAUTH_REDIRECT_URI:-http://localhost:8000/api/callback}
+      OPENAI_API_KEY: ${OPENAI_API_KEY:-}
+      WATCHFILES_FORCE_POLLING: "true"
+    ports:
+      - "8000:8000"
+    depends_on:
+      db:
+        condition: service_healthy
+    command: >
+      sh -c "alembic -c /app/alembic.ini upgrade head &&
+      uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload --reload-delay 1"
+    volumes:
+      - ./backend:/app
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: delivery-tracker-frontend
+    environment:
+      VITE_API_BASE_URL: http://localhost:8000
+    ports:
+      - "3000:80"
+    depends_on:
+      - backend
+
+volumes:
+  delivery-tracker-pgdata:

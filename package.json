@@ -1,0 +1,12 @@
+{
+  "name": "delivery-tracker-root",
+  "private": true,
+  "version": "0.1.0",
+  "scripts": {
+    "prepare:config": "sh -c 'printf \"//npm.pkg.github.com/:_authToken=%s\\n\" \"$GITHUB_TOKEN\" > .npmrc'",
+    "postinstall": "npm --prefix frontend ci",
+    "generate": "node -e \"console.log('no codegen')\"",
+    "lint": "npm --prefix frontend run lint",
+    "test:coverage:ci": "npm --prefix frontend test"
+  }
+}

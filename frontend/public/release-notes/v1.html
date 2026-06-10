@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Delivery Tracker – Release Notes v1</title>
+  <style>
+    :root {
+      --text: #0f172a;
+      --muted: #64748b;
+      --border: #e2e8f0;
+      --panel: #ffffff;
+      --accent: #2563eb;
+      --bg: #f8fafc;
+    }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      color: var(--text);
+      background: var(--bg);
+      margin: 0;
+      padding: 32px;
+    }
+    .container {
+      max-width: 1100px;
+      margin: 0 auto;
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 32px;
+      box-shadow: 0 6px 22px rgba(15, 23, 42, 0.08);
+    }
+    h1 { margin: 0 0 8px; font-size: 28px; }
+    h2 { margin-top: 28px; font-size: 20px; border-bottom: 1px solid var(--border); padding-bottom: 8px; }
+    h3 { margin-top: 20px; font-size: 16px; }
+    p { color: var(--muted); line-height: 1.6; }
+    ul { margin: 8px 0 0 18px; }
+    li { margin: 6px 0; }
+    .tag {
+      display: inline-block;
+      padding: 2px 8px;
+      border-radius: 999px;
+      background: #e2e8f0;
+      color: #334155;
+      font-size: 12px;
+      margin-right: 6px;
+    }
+    .note {
+      background: #f1f5f9;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 12px 14px;
+      font-size: 14px;
+      color: #334155;
+    }
+    .code {
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+      background: #0f172a;
+      color: #e2e8f0;
+      padding: 10px 12px;
+      border-radius: 8px;
+      font-size: 12px;
+      overflow-x: auto;
+    }
+    .diagram {
+      border: 1px dashed var(--border);
+      border-radius: 10px;
+      padding: 12px;
+      background: #fff;
+      margin-top: 10px;
+    }
+    .nav {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+      margin: 12px 0 6px;
+    }
+    .nav a {
+      color: var(--accent);
+      text-decoration: none;
+      font-size: 13px;
+      font-weight: 600;
+    }
+    .nav a:hover { text-decoration: underline; }
+    .footer {
+      margin-top: 32px;
+      font-size: 12px;
+      color: var(--muted);
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Delivery Tracker – Release Notes v1</h1>
+    <p><span class="tag">Release Date</span> Feb 20, 2026</p>
+
+    <div class="nav">
+      <a href="/release-notes">Release Notes Index</a>
+      <a href="/release-notes/v3">v3</a>
+      <a href="/release-notes/v2">v2</a>
+      <a href="#summary">Summary</a>
+      <a href="#features">Key Features</a>
+      <a href="#usage">How to Use</a>
+      <a href="#diagram">Diagram</a>
+      <a href="#limits">Notes</a>
+    </div>
+
+    <h2 id="summary">Summary</h2>
+    <p>
+      Delivery Tracker provides a roadmap view that combines Jira Fix Versions → Epics → Stories
+      with local-only UAT / Live / Milestone data. It includes multi-panel dashboards with rich-text
+      updates, filters saved per dashboard, and a Gantt timeline view.
+    </p>
+
+    <h2 id="features">Key Features</h2>
+    <h3>Jira OAuth (3LO)</h3>
+    <ul>
+      <li>Sign in with Jira to fetch live roadmap data.</li>
+      <li>Session stored locally for API access.</li>
+    </ul>
+
+    <h3>Dashboards & Panels</h3>
+    <ul>
+      <li>Multiple rich-text panels per dashboard.</li>
+      <li>Fixed grid layout with width presets: Full / Two-thirds / Half / Third / Quarter.</li>
+      <li>Panel collapse / expand and delete (when signed in).</li>
+    </ul>
+
+    <h3>Rich Text Editor</h3>
+    <ul>
+      <li>Paragraph + headings</li>
+      <li>Bold / Italic / Underline / Strike / Code</li>
+      <li>Bullet, numbered, and checkbox lists</li>
+      <li>Links and images</li>
+      <li>Status/label pills</li>
+    </ul>
+
+    <h3>Filters (Saved Per Dashboard)</h3>
+    <ul>
+      <li>Projects (multi-select)</li>
+      <li>Statuses</li>
+      <li>Types (issue types)</li>
+      <li>Increment start / end</li>
+    </ul>
+
+    <h3>Gantt Timeline</h3>
+    <ul>
+      <li>Fix Version → Epic → Story nesting</li>
+      <li>Collapsible rows</li>
+      <li>Increment window clamps the visible range</li>
+      <li>UAT / Live markers</li>
+      <li>Milestone markers</li>
+    </ul>
+
+    <h3>Local‑Only Data</h3>
+    <ul>
+      <li>UAT date range per Fix Version</li>
+      <li>Live date range per Fix Version</li>
+      <li>Milestones (label + date + color)</li>
+    </ul>
+
+    <h2 id="usage">How to Use</h2>
+    <h3>1) Sign In</h3>
+    <p>Use the “Sign in to Jira” button in the header.</p>
+
+    <h3>2) Open a Dashboard</h3>
+    <p>Visit <span class="tag">/dashboards/:slug</span> (e.g., <span class="tag">/dashboards/gpo</span>).</p>
+
+    <h3>3) Configure Filters</h3>
+    <ul>
+      <li>Select projects, statuses, and issue types.</li>
+      <li>Set increment start/end.</li>
+      <li>Save filters for the dashboard.</li>
+    </ul>
+
+    <h3>4) Update Panels</h3>
+    <ul>
+      <li>Edit panel content via the toolbar.</li>
+      <li>Add labels, links, lists, and images.</li>
+      <li>Save changes with the Save button.</li>
+    </ul>
+
+    <h3>5) Review the Timeline</h3>
+    <ul>
+      <li>Fix Versions are the top-level rows.</li>
+      <li>Expand to see epics and stories.</li>
+      <li>Update UAT/Live dates if needed (stored locally).</li>
+    </ul>
+
+    <h2 id="diagram">System Diagram</h2>
+    <p class="note">Confluence supports Mermaid. Paste the diagram block below to render it.</p>
+    <div class="diagram">
+<pre class="code">mermaid
+flowchart TB
+  U[User] -->|Sign in| FE[Frontend UI]
+  FE -->|Jira OAuth 3LO| JIRA[Jira Cloud]
+  FE -->|REST API| BE[Backend API]
+  BE -->|JQL + Jira REST| JIRA
+  BE -->|UAT/Live/Milestones| DB[(Postgres)]
+  FE -->|Dashboards + Filters| BE
+</pre>
+    </div>
+
+    <h2 id="limits">Notes / Limitations</h2>
+    <ul>
+      <li>Local-only fields do not sync back to Jira.</li>
+      <li>Panel layout is fixed grid (no drag/resize yet).</li>
+      <li>Access requires Jira authentication.</li>
+    </ul>
+
+    <div class="footer">
+      Generated from main branch feature set. Update as features evolve.
+    </div>
+  </div>
+</body>
+</html>

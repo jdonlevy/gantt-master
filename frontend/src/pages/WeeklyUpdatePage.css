@@ -1,0 +1,741 @@
+/* WeeklyUpdatePage.css
+   All rules are prefixed with .wu- to avoid conflicts with app-level styles.
+   The root wrapper is .wu-page. */
+
+.wu-page {
+  padding: 0 24px 48px;
+}
+
+.wu-back-bar {
+  padding: 16px 0 14px;
+  max-width: 1100px;
+  margin: 0 auto;
+}
+
+.wu-back-link {
+  font-size: 12px;
+  color: #64748b;
+  text-decoration: none;
+  transition: color 0.15s;
+  font-weight: 500;
+}
+.wu-back-link:hover { color: #e2e8f0; }
+
+/* ── Shell ── */
+.wu-shell {
+  max-width: 1100px;
+  margin: 0 auto;
+  border: 1px solid #2a2d35;
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.4);
+  font-family: Manrope, sans-serif;
+  color: #e2e8f0;
+}
+
+/* ── Panel header ── */
+.wu-panel-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 20px;
+  background: #1a1d24;
+  border-bottom: 1px solid #2a2d35;
+}
+.wu-panel-title { font-size: 13px; font-weight: 600; color: #e2e8f0; }
+.wu-panel-actions { display: flex; gap: 8px; align-items: center; }
+
+.wu-btn-generate {
+  display: flex; align-items: center; gap: 6px;
+  padding: 7px 14px;
+  background: linear-gradient(135deg, #6366f1, #8b5cf6);
+  border: none; border-radius: 8px;
+  color: #fff; font-size: 13px; font-weight: 600;
+  cursor: pointer; font-family: inherit;
+}
+.wu-btn-generate:hover { opacity: 0.9; }
+
+.wu-btn-present {
+  display: flex; align-items: center; gap: 6px;
+  padding: 7px 14px;
+  background: transparent;
+  border: 1px solid rgba(99,102,241,0.85); border-radius: 8px;
+  color: #818cf8; font-size: 13px; font-weight: 600;
+  cursor: pointer; font-family: inherit;
+  transition: background 0.12s, border-color 0.12s, color 0.12s;
+}
+.wu-btn-present:hover { background: rgba(99,102,241,0.16); border-color: #6366f1; color: #c7d2fe; }
+
+.wu-btn-save {
+  padding: 5px 12px;
+  background: #1e2230; border: 1px solid #2a2d35;
+  border-radius: 8px; color: #94a3b8;
+  font-size: 12px; font-weight: 600;
+  cursor: pointer; font-family: inherit;
+}
+.wu-btn-save:hover { border-color: #374151; color: #e2e8f0; }
+
+/* ── Label bar ── */
+.wu-label-bar {
+  text-align: center; padding: 10px;
+  font-size: 11px; color: #4b5563;
+  letter-spacing: 0.05em; text-transform: uppercase;
+  background: #0f1115; border-bottom: 1px solid #1e2230;
+}
+
+/* ── Panel body ── */
+.wu-panel-body { background: #161920; padding: 24px 28px; }
+
+.wu-meta-row {
+  display: flex; align-items: center; justify-content: space-between;
+  margin-bottom: 24px; padding-bottom: 16px; border-bottom: 1px solid #2a2d35;
+}
+.wu-meta-title { font-size: 18px; font-weight: 700; color: #e2e8f0; }
+.wu-meta-date  { font-size: 12px; color: #64748b; }
+
+.wu-edit-hint {
+  display: flex; align-items: center; gap: 6px;
+  font-size: 11px; color: #374151;
+  margin-bottom: 20px; padding: 6px 10px;
+  background: rgba(99, 102, 241, 0.06);
+  border: 1px solid rgba(99, 102, 241, 0.15);
+  border-radius: 8px;
+}
+
+/* ── Released section ── */
+.wu-released-section {
+  background: rgba(34, 197, 94, 0.04);
+  border: 1px solid rgba(34, 197, 94, 0.2);
+  border-radius: 12px;
+  padding: 16px 20px;
+  margin-bottom: 28px;
+}
+
+.wu-released-label {
+  display: flex; align-items: center; gap: 6px;
+  font-size: 10px; font-weight: 700;
+  letter-spacing: 0.08em; text-transform: uppercase;
+  color: #4ade80; margin-bottom: 10px;
+}
+.wu-released-dot {
+  width: 6px; height: 6px; border-radius: 50%;
+  background: #22c55e;
+  box-shadow: 0 0 6px rgba(34, 197, 94, 0.6);
+  flex-shrink: 0;
+}
+
+/* ── Section ── */
+.wu-section {
+  position: relative;
+  padding: 16px 20px 20px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-radius: 12px;
+}
+/* Hide button sits inside the card border */
+.wu-section > .wu-hide-btn { top: 12px; right: 12px; }
+
+/* Released item wrapper (for absolute-positioned hide btn) */
+/* Right padding reserves space for the absolutely-positioned Hide (right:0,
+   ~40px wide) and Regen (right:56, ~70px wide) buttons so the green
+   "Released DD Mon YYYY" date span doesn't slide under the Regen button.
+   Tight enough to keep the divider line a sensible length, wide enough for
+   ~14px of breathing room between the date and the Regen button. */
+.wu-released-item {
+  position: relative;
+  margin-bottom: 16px;
+  padding-right: 140px;
+}
+
+.wu-section-header {
+  display: flex; align-items: center; gap: 8px;
+  margin-bottom: 8px; flex-wrap: wrap;
+  /* Reserve space on the right for the absolutely-positioned Hide + Regen
+     buttons so status badges ("PENDING RELEASE", "IN PROGRESS", etc.)
+     never slide underneath them. Kept only on the inline-panel variant
+     via .wu-section so the full-page variant is unaffected. */
+}
+.wu-section > .wu-section-header { padding-right: 150px; }
+
+/* Badge group — keeps increment + status badges together as a unit */
+.wu-section-badges {
+  display: flex; align-items: center; gap: 6px; flex-shrink: 0;
+}
+
+.wu-section-name {
+  font-size: 13px; font-weight: 700;
+  letter-spacing: 0.06em; text-transform: uppercase;
+  color: #e2e8f0; text-decoration: none;
+  display: inline-flex; align-items: center; gap: 5px;
+  transition: color 0.15s;
+}
+.wu-section-name:hover { color: #818cf8; }
+.wu-section-name svg { opacity: 0.4; transition: opacity 0.15s; flex-shrink: 0; }
+.wu-section-name:hover svg { opacity: 0.8; }
+
+.wu-section-name--released { color: #4ade80; }
+.wu-section-name--released:hover { color: #86efac; }
+
+.wu-divider-line {
+  flex: 1; height: 1px; background: #2a2d35; min-width: 20px;
+}
+.wu-released-section .wu-divider-line { background: rgba(34, 197, 94, 0.15); }
+
+/* ── Standard badges ── */
+.wu-badge {
+  display: inline-flex; align-items: center;
+  padding: 2px 8px; border-radius: 5px;
+  font-size: 10px; font-weight: 700;
+  letter-spacing: 0.05em; text-transform: uppercase; white-space: nowrap;
+}
+.wu-badge--in-progress { background: rgba(99,102,241,0.15); color: #818cf8; border: 1px solid rgba(99,102,241,0.3); }
+.wu-badge--increment   { background: transparent; color: #64748b; border: 1px solid #2a2d35; }
+.wu-badge--released    { background: rgba(34,197,94,0.15); color: #4ade80; border: 1px solid rgba(34,197,94,0.3); }
+.wu-badge--today       { background: rgba(245,158,11,0.15); color: #fbbf24; border: 1px solid rgba(245,158,11,0.3); }
+.wu-badge--pending-rel { background: rgba(99,102,241,0.12); color: #a5b4fc; border: 1px solid rgba(99,102,241,0.3); }
+.wu-badge--rag-red   { background: rgba(239,68,68,0.12);  color: #f87171; border: 1px solid rgba(239,68,68,0.35); }
+.wu-badge--rag-amber { background: rgba(251,191,36,0.12); color: #fbbf24; border: 1px solid rgba(251,191,36,0.35); }
+.wu-badge--rag-green { background: rgba(34,197,94,0.12);  color: #4ade80; border: 1px solid rgba(34,197,94,0.35); }
+
+/* ── Ticket count pill ── */
+.wu-ticket-count {
+  display: inline-flex; align-items: center;
+  border-radius: 5px; font-size: 10px; font-weight: 700;
+  letter-spacing: 0.05em; text-transform: uppercase;
+  white-space: nowrap; overflow: hidden; border: 1px solid;
+}
+.wu-ticket-count--green { border-color: rgba(34,197,94,0.25); }
+.wu-ticket-count--red   { border-color: rgba(239,68,68,0.3); }
+.wu-ticket-count--blue  { border-color: rgba(96,165,250,0.35); }
+
+.wu-ticket-todo { padding: 2px 8px; }
+.wu-ticket-count--green .wu-ticket-todo { background: rgba(34,197,94,0.12); color: #4ade80; }
+.wu-ticket-count--red   .wu-ticket-todo { background: rgba(239,68,68,0.12); color: #f87171; }
+.wu-ticket-count--blue  .wu-ticket-todo { background: rgba(96,165,250,0.14); color: #60a5fa; }
+
+.wu-ticket-sep { padding: 2px 4px; font-size: 9px; color: #374151; }
+.wu-ticket-count--green .wu-ticket-sep { background: rgba(34,197,94,0.06); }
+.wu-ticket-count--red   .wu-ticket-sep { background: rgba(239,68,68,0.06); }
+.wu-ticket-count--blue  .wu-ticket-sep { background: rgba(96,165,250,0.08); }
+
+.wu-ticket-total { padding: 2px 8px; color: #64748b; }
+.wu-ticket-count--green .wu-ticket-total { background: rgba(34,197,94,0.05); }
+.wu-ticket-count--red   .wu-ticket-total { background: rgba(239,68,68,0.04); }
+.wu-ticket-count--blue  .wu-ticket-total { background: rgba(96,165,250,0.06); }
+
+/* ── Dates & version note ── */
+.wu-section-meta {
+  display: flex; align-items: flex-start; gap: 16px;
+  margin-bottom: 10px; flex-wrap: wrap;
+}
+.wu-section-dates { display: flex; gap: 16px; flex-wrap: wrap; flex-shrink: 0; }
+.wu-date-item { display: flex; align-items: center; gap: 5px; font-size: 11px; }
+.wu-date-label { color: #4b5563; font-weight: 700; letter-spacing: 0.05em; text-transform: uppercase; }
+.wu-date-value { color: var(--text); font-weight: 600; }
+.wu-date-value--urgent { color: var(--text); }
+.wu-date-dot { width: 5px; height: 5px; border-radius: 50%; flex-shrink: 0; }
+.wu-dot-uat    { background: #f59e0b; }
+.wu-dot-target { background: #6366f1; }
+
+.wu-version-note {
+  display: flex; align-items: flex-start; gap: 5px;
+  font-size: 11px; color: #4b5563; font-style: italic; line-height: 1.4;
+  border-left: 2px solid #2a2d35; padding-left: 8px;
+  flex: 1; min-width: 0;
+}
+.wu-version-note strong { color: #374151; font-size: 10px; font-weight: 700; font-style: normal; white-space: nowrap; }
+
+/* ── Per-item (inline) badges ── */
+.wu-ibadge {
+  display: inline-flex; align-items: center;
+  padding: 1px 6px; border-radius: 4px;
+  font-size: 10px; font-weight: 700; letter-spacing: 0.04em;
+  text-transform: uppercase; white-space: nowrap;
+  vertical-align: middle; margin-left: 5px;
+}
+.wu-ibadge--uat     { background: rgba(245,158,11,0.15); color: #f59e0b; border: 1px solid rgba(245,158,11,0.3); }
+.wu-ibadge--review  { background: rgba(168,85,247,0.15); color: #c084fc; border: 1px solid rgba(168,85,247,0.3); }
+.wu-ibadge--devdone { background: rgba(34,197,94,0.12);  color: #4ade80; border: 1px solid rgba(34,197,94,0.2); }
+.wu-ibadge--done    { background: rgba(34,197,94,0.15);  color: #22c55e; border: 1px solid rgba(34,197,94,0.3); }
+.wu-ibadge--prog    { background: rgba(99,102,241,0.15); color: #818cf8; border: 1px solid rgba(99,102,241,0.3); }
+.wu-ibadge--await   { background: rgba(251,191,36,0.12); color: #fbbf24; border: 1px solid rgba(251,191,36,0.25); }
+.wu-ibadge--backlog { background: rgba(100,116,139,0.15); color: #94a3b8; border: 1px solid rgba(100,116,139,0.2); }
+.wu-ibadge--blocked { background: rgba(239,68,68,0.12);  color: #f87171; border: 1px solid rgba(239,68,68,0.25); }
+.wu-ibadge--closed  { background: rgba(34,197,94,0.1);   color: #6ee7b7; border: 1px solid rgba(34,197,94,0.2); }
+.wu-ibadge--released { background: rgba(34,197,94,0.15); color: #22c55e; border: 1px solid rgba(34,197,94,0.3); }
+
+/* ── Editable prose summary ── */
+.wu-section-summary {
+  display: block;
+  font-size: 13px; color: var(--text); line-height: 1.65;
+  margin-bottom: 14px; font-style: normal;
+  border-radius: 6px; padding: 6px 8px; margin-left: -8px;
+  outline: none;
+  transition: background 0.15s, border-color 0.15s, color 0.15s;
+  border: 1px solid transparent;
+  cursor: text; white-space: normal; overflow-wrap: break-word;
+}
+.wu-item { color: var(--text); }
+.wu-section-summary:hover { border-color: #2a2d35; background: #1a1d24; }
+.wu-section-summary:focus { border-color: rgba(99,102,241,0.4); background: #1a1d24; color: #cbd5e1; font-style: italic; }
+body:not([data-theme='dark']) .wu-section-summary:focus {
+  background: var(--panel-soft);
+  color: var(--muted);
+}
+
+/* Light-mode hover override: the dark-mode values above render near-black on
+   the white card backgrounds, which is too contrasty. Use the app's light
+   panel-soft + border tokens instead so the hover cue is visible but subtle.
+   Focus state is left alone to keep the distinct "I'm editing this" look. */
+body:not([data-theme='dark']) .wu-section-summary:hover {
+  border-color: var(--border);
+  background: var(--panel-soft);
+}
+.wu-released-section .wu-section-summary:hover { border-color: rgba(34,197,94,0.2); background: rgba(34,197,94,0.04); }
+.wu-released-section .wu-section-summary:focus { border-color: rgba(34,197,94,0.4); }
+
+/* ── Sub-sections (collapsible) ── */
+.wu-sub-section { margin-bottom: 12px; }
+
+.wu-sub-section-label {
+  /* Reset button defaults */
+  background: none; border: none; outline: none; text-align: left; width: 100%;
+  font-size: 10px; font-weight: 700; letter-spacing: 0.08em;
+  text-transform: uppercase; color: #4b5563;
+  cursor: pointer; user-select: none;
+  display: flex; align-items: center; gap: 5px;
+  padding: 4px 0; margin-bottom: 0;
+  transition: color 0.12s;
+}
+.wu-sub-section-label:hover { color: #64748b; }
+.wu-sub-section-label::before {
+  content: '';
+  display: inline-block;
+  width: 0; height: 0;
+  border-top: 3.5px solid transparent;
+  border-bottom: 3.5px solid transparent;
+  border-left: 5px solid currentcolor;
+  flex-shrink: 0;
+  transition: transform 0.18s ease;
+}
+.wu-sub-section--open .wu-sub-section-label { color: #64748b; }
+.wu-sub-section--open .wu-sub-section-label::before { transform: rotate(90deg); }
+
+.wu-items {
+  display: none;
+  flex-direction: column; gap: 6px;
+  padding-left: 2px; margin-top: 6px;
+}
+.wu-sub-section--open .wu-items { display: flex; }
+
+/* ── Item rows ── */
+.wu-item {
+  display: flex; align-items: baseline; gap: 9px;
+  font-size: 13px; line-height: 1.5; color: var(--text);
+}
+.wu-item::before { content: '•'; color: #374151; flex-shrink: 0; }
+
+.wu-item-text {
+  flex: 1; outline: none; border-radius: 4px;
+  padding: 1px 4px; margin-left: -4px;
+  border: 1px solid transparent;
+  transition: background 0.12s, border-color 0.12s;
+}
+
+/* ── Two-column grid ── */
+.wu-columns {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 24px;
+  align-items: start;
+}
+/* Last section full-width when count is odd */
+.wu-columns > :last-child:nth-child(odd) { grid-column: 1 / -1; }
+@media (max-width: 720px) {
+  .wu-columns { grid-template-columns: 1fr; }
+}
+
+/* ── SVG link icon ── */
+.wu-link-icon { width: 10px; height: 10px; }
+
+/* ── Dark-mode readability overrides ── */
+body[data-theme='dark'] .wu-date-label,
+body[data-theme='dark'] .wu-version-note,
+body[data-theme='dark'] .wu-sub-section-label,
+body[data-theme='dark'] .wu-inline-meta,
+body[data-theme='dark'] .wu-edit-hint {
+  color: #cbd5e1;
+}
+body:not([data-theme='dark']) .wu-version-note {
+  border-left-color: var(--border);
+}
+body[data-theme='dark'] .wu-date-value,
+body[data-theme='dark'] .wu-version-note strong,
+body[data-theme='dark'] .wu-sub-section--open .wu-sub-section-label {
+  color: var(--text);
+}
+
+/* ── Inline panel variant (WeeklyUpdatePanel inside dashboard) ── */
+.wu-inline {
+  padding: 16px 20px 20px;
+  font-family: Manrope, sans-serif;
+  /* Use the theme-aware text token so descendants inherit near-black in
+     light mode and off-white in dark mode. Previously hard-coded to a
+     near-white grey (#e2e8f0) which rendered as pale-on-pale in light
+     mode for anything that didn't have its own explicit colour. */
+  color: var(--text);
+}
+
+.wu-inline-actions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 4px;
+  gap: 12px;
+}
+
+.wu-inline-meta {
+  font-size: 14px;
+  color: #4b5563;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+/* Hide button — pinned top-right of each section card */
+.wu-hide-btn {
+  position: absolute;
+  top: 0; right: 0;
+  padding: 2px 8px;
+  background: transparent;
+  border: 1px solid #2a2d35;
+  border-radius: 5px;
+  color: #4b5563;
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  cursor: pointer;
+  font-family: inherit;
+  transition: border-color 0.12s, color 0.12s;
+}
+.wu-hide-btn:hover { border-color: #ef4444; color: #f87171; }
+
+/* Per-section regenerate button — filled purple to match the main
+   ✦ Generate button. Using the same gradient + white text signals that
+   this is a generative action (vs. the outlined, muted Hide button which
+   is destructive). */
+.wu-regen-btn {
+  position: absolute;
+  padding: 2px 10px;
+  background: linear-gradient(135deg, #6366f1, #8b5cf6);
+  border: none;
+  border-radius: 5px;
+  color: #fff;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  cursor: pointer;
+  font-family: inherit;
+  transition: opacity 0.12s, filter 0.12s;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  line-height: 1.4;
+}
+.wu-regen-btn:hover:not(:disabled) { filter: brightness(1.08); }
+.wu-regen-btn:disabled { opacity: 0.5; cursor: wait; }
+.wu-regen-btn-icon { display: inline-block; font-size: 12px; color: #fff; }
+.wu-regen-btn.is-spinning .wu-regen-btn-icon { animation: wu-regen-spin 0.9s linear infinite; }
+@keyframes wu-regen-spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+/* Positioning: inside a main section card, Hide sits at right: 12px, so regen
+   sits to its left with a small gap. */
+.wu-section > .wu-regen-btn { top: 12px; right: 70px; }
+/* Inside a released-item row, Hide is flush right (right: 0); regen sits to
+   its left. Also expand the row's right-padding so summary text doesn't run
+   under either button. */
+.wu-released-item > .wu-regen-btn { top: 0; right: 56px; }
+/* Belt-and-braces: also constrain the flex header inside released items so
+   the green date span breaks to a new line rather than overflowing into the
+   button gutter on narrow viewports. */
+.wu-released-item > .wu-section-header { max-width: 100%; min-width: 0; }
+
+/* RAG status indicator */
+.wu-rag {
+  display: inline-flex; align-items: center; gap: 5px;
+  padding: 2px 8px 2px 6px;
+  border-radius: 5px;
+  border: 1px solid;
+  font-size: 10px; font-weight: 700;
+  letter-spacing: 0.05em; text-transform: uppercase;
+  cursor: pointer; font-family: inherit;
+  transition: opacity 0.12s;
+  flex-shrink: 0;
+}
+.wu-rag:hover { opacity: 0.8; }
+.wu-rag-dot {
+  width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0;
+}
+.wu-rag--red   { color: #f87171; border-color: rgba(239,68,68,0.35);   background: rgba(239,68,68,0.08); }
+.wu-rag--red   .wu-rag-dot { background: #ef4444; box-shadow: 0 0 5px rgba(239,68,68,0.6); }
+.wu-rag--amber { color: #fbbf24; border-color: rgba(251,191,36,0.35);  background: rgba(251,191,36,0.08); }
+.wu-rag--amber .wu-rag-dot { background: #f59e0b; box-shadow: 0 0 5px rgba(245,158,11,0.6); }
+.wu-rag--green { color: #4ade80; border-color: rgba(34,197,94,0.35);   background: rgba(34,197,94,0.08); }
+.wu-rag--green .wu-rag-dot { background: #22c55e; box-shadow: 0 0 5px rgba(34,197,94,0.6); }
+
+/* RAG indicator row — sits on its own line below the section header */
+.wu-rag-row { margin: 4px 0 8px; }
+
+/* Ticket count row above sub-section dropdowns */
+.wu-ticket-count-row { margin: 8px 0 6px; }
+
+/* Restore-all button — shown in action bar when items are hidden */
+.wu-unhide-btn {
+  padding: 3px 10px;
+  background: rgba(99,102,241,0.08);
+  border: 1px solid rgba(99,102,241,0.25);
+  border-radius: 6px;
+  color: #818cf8;
+  font-size: 11px;
+  font-weight: 600;
+  cursor: pointer;
+  font-family: inherit;
+  transition: background 0.12s, border-color 0.12s;
+}
+.wu-unhide-btn:hover { background: rgba(99,102,241,0.15); border-color: rgba(99,102,241,0.4); }
+
+/* ── Confirmation modal ── */
+.wu-modal-overlay {
+  position: fixed; inset: 0;
+  background: rgba(0, 0, 0, 0.6);
+  display: flex; align-items: center; justify-content: center;
+  z-index: 1000;
+  backdrop-filter: blur(2px);
+}
+.wu-modal {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 24px 28px;
+  max-width: 360px;
+  width: 90%;
+  box-shadow: 0 8px 40px rgba(0, 0, 0, 0.4);
+  font-family: Manrope, sans-serif;
+}
+.wu-modal-title {
+  font-size: 14px; font-weight: 700; color: var(--text);
+  margin: 0 0 8px;
+}
+.wu-modal-body {
+  font-size: 13px; color: var(--muted); line-height: 1.6;
+  margin: 0 0 20px;
+}
+.wu-modal-actions {
+  display: flex; justify-content: flex-end; gap: 8px;
+}
+.wu-modal-cancel {
+  padding: 6px 14px;
+  background: transparent;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  color: var(--muted);
+  font-size: 12px; font-weight: 600;
+  cursor: pointer; font-family: inherit;
+  transition: border-color 0.12s, color 0.12s;
+}
+.wu-modal-cancel:hover { border-color: var(--muted); color: var(--text); }
+.wu-modal-confirm {
+  padding: 6px 14px;
+  background: linear-gradient(135deg, #6366f1, #8b5cf6);
+  border: none; border-radius: 8px;
+  color: #fff;
+  font-size: 12px; font-weight: 600;
+  cursor: pointer; font-family: inherit;
+  transition: opacity 0.12s;
+}
+.wu-modal-confirm:hover { opacity: 0.85; }
+
+/* ── Conciseness control (in Generate modal) ─────────────────────────────── */
+.wu-conciseness-control {
+  margin-top: 14px;
+  padding-top: 12px;
+  border-top: 1px solid var(--border);
+}
+.wu-conciseness-control-label {
+  display: block;
+  font-size: 11px;
+  font-weight: 600;
+  color: #64748b;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-bottom: 8px;
+}
+.wu-conciseness-options {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+.wu-conciseness-option {
+  padding: 4px 10px;
+  background: transparent;
+  border: 1px solid #2a2d35;
+  border-radius: 6px;
+  color: #94a3b8;
+  font-size: 11px;
+  font-weight: 500;
+  cursor: pointer;
+  font-family: inherit;
+  transition: border-color 0.12s, color 0.12s, background 0.12s;
+}
+.wu-conciseness-option:hover {
+  border-color: #6366f1;
+  color: #e2e8f0;
+}
+.wu-conciseness-option.is-active {
+  background: rgba(99, 102, 241, 0.15);
+  border-color: #6366f1;
+  color: #a5b4fc;
+  font-weight: 600;
+}
+
+/* ── Section footer (conciseness select) ─────────────────────────────────── */
+.wu-section-footer {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 7px;
+  margin-top: 12px;
+  padding-top: 9px;
+  border-top: 1px solid var(--border);
+}
+.wu-conciseness-footer-label {
+  font-size: 11px;
+  font-weight: 600;
+  color: #4b5563;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  user-select: none;
+}
+.wu-conciseness-footer-select {
+  appearance: none;
+  -webkit-appearance: none;
+  padding: 3px 22px 3px 8px;
+  background-color: #161920;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%234b5563'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 7px center;
+  border: 1px solid #2a2d35;
+  border-radius: 5px;
+  color: #94a3b8;
+  font-size: 11px;
+  font-family: inherit;
+  cursor: pointer;
+  transition: border-color 0.12s, color 0.12s;
+  min-width: 90px;
+}
+.wu-conciseness-footer-select:hover {
+  border-color: #6366f1;
+  color: #e2e8f0;
+}
+.wu-conciseness-footer-select:disabled {
+  opacity: 0.4;
+  cursor: default;
+}
+
+/* ── Summary editor (formatting toolbar + contentEditable) ────────────────── */
+.wu-summary-editor {
+  position: relative;
+}
+.wu-summary-toolbar {
+  margin-bottom: 4px;
+  padding: 3px 0;
+  border-bottom: 1px solid #1e2230;
+}
+/* Collapsed state: only show the Aa toggle, right-aligned */
+.wu-summary-toolbar.panel-toolbar--collapsed {
+  border-bottom-color: transparent;
+  margin-bottom: 2px;
+}
+
+/* ── Section-level presence ──────────────────────────────────────────────── */
+.wu-section.is-being-edited,
+.wu-released-item.is-being-edited {
+  outline: 2px solid var(--presence-colour, #6366f1);
+  outline-offset: -1px;
+  box-shadow: 0 0 0 4px color-mix(in srgb, var(--presence-colour, #6366f1) 15%, transparent);
+  border-radius: 12px;
+}
+.wu-presence-badges {
+  display: flex;
+  gap: 4px;
+  align-items: center;
+  margin-left: auto;
+}
+.wu-presence-avatar {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 10px;
+  font-weight: 700;
+  color: #fff;
+  flex-shrink: 0;
+  overflow: hidden;
+}
+.wu-presence-avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* ── Typing cursor indicator ─────────────────────────────────────────────── */
+@keyframes wu-cursor-blink {
+  0%, 100% { opacity: 1; }
+  50%       { opacity: 0; }
+}
+.wu-remote-cursor {
+  display: inline-block;
+  width: 2px;
+  height: 1em;
+  vertical-align: text-bottom;
+  background: var(--presence-colour, #6366f1);
+  animation: wu-cursor-blink 1s step-end infinite;
+  margin-left: 2px;
+  border-radius: 1px;
+}
+
+/* ── Avatar tooltip (CSS-based, more reliable than title attr) ──────────── */
+.wu-presence-avatar,
+.panel-presence-avatar {
+  position: relative;
+}
+.wu-presence-avatar::after,
+.panel-presence-avatar::after {
+  content: attr(data-tooltip);
+  position: absolute;
+  bottom: calc(100% + 6px);
+  left: 50%;
+  transform: translateX(-50%);
+  background: #1e2230;
+  color: #e2e8f0;
+  font-size: 11px;
+  font-weight: 500;
+  white-space: nowrap;
+  padding: 4px 8px;
+  border-radius: 5px;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.15s;
+  z-index: 100;
+  border: 1px solid #2a2d3a;
+}
+.wu-presence-avatar:hover::after,
+.panel-presence-avatar:hover::after {
+  opacity: 1;
+}

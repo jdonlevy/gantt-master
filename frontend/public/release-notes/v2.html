@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Delivery Tracker – Release Notes v2</title>
+  <style>
+    :root {
+      --text: #0f172a;
+      --muted: #64748b;
+      --border: #e2e8f0;
+      --panel: #ffffff;
+      --accent: #2563eb;
+      --bg: #f8fafc;
+    }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      color: var(--text);
+      background: var(--bg);
+      margin: 0;
+      padding: 32px;
+    }
+    .container {
+      max-width: 1100px;
+      margin: 0 auto;
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 32px;
+      box-shadow: 0 6px 22px rgba(15, 23, 42, 0.08);
+    }
+    h1 { margin: 0 0 8px; font-size: 28px; }
+    h2 { margin-top: 28px; font-size: 20px; border-bottom: 1px solid var(--border); padding-bottom: 8px; }
+    h3 { margin-top: 20px; font-size: 16px; }
+    p { color: var(--muted); line-height: 1.6; }
+    ul { margin: 8px 0 0 18px; }
+    li { margin: 6px 0; }
+    .tag {
+      display: inline-block;
+      padding: 2px 8px;
+      border-radius: 999px;
+      background: #e2e8f0;
+      color: #334155;
+      font-size: 12px;
+      margin-right: 6px;
+    }
+    .note {
+      background: #f1f5f9;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 12px 14px;
+      font-size: 14px;
+      color: #334155;
+    }
+    .code {
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+      background: #0f172a;
+      color: #e2e8f0;
+      padding: 10px 12px;
+      border-radius: 8px;
+      font-size: 12px;
+      overflow-x: auto;
+    }
+    .nav {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+      margin: 12px 0 6px;
+    }
+    .nav a {
+      color: var(--accent);
+      text-decoration: none;
+      font-size: 13px;
+      font-weight: 600;
+    }
+    .nav a:hover { text-decoration: underline; }
+    .footer {
+      margin-top: 32px;
+      font-size: 12px;
+      color: var(--muted);
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Delivery Tracker – Release Notes v2</h1>
+    <p><span class="tag">Release Date</span> Mar 6, 2026</p>
+
+    <div class="nav">
+      <a href="/release-notes">Release Notes Index</a>
+      <a href="/release-notes/v3">v3</a>
+      <a href="/release-notes/v1">v1</a>
+      <a href="#summary">Summary</a>
+      <a href="#features">Key Updates</a>
+      <a href="#usage">How to Use</a>
+      <a href="#notes">Notes</a>
+    </div>
+
+    <h2 id="summary">Summary</h2>
+    <p>
+      v2 focuses on usability, visual consistency, and operational reliability.
+      Jira roadmap data now links back to Jira, authentication failures sign you out
+      cleanly, and the timeline view includes theme-aware styling with improved
+      alignment and tooltips.
+    </p>
+
+    <h2 id="features">Key Updates</h2>
+    <h3>Gantt Timeline Enhancements</h3>
+    <ul>
+      <li>Theme-aware Fix Version bars (light/dark) for unreleased items.</li>
+      <li>Vertical timeline grid lines extend through the chart for easier scanning.</li>
+      <li>Hover tooltips show start/end dates for bars.</li>
+      <li>Milestone and UAT/Live marker alignment refined.</li>
+    </ul>
+
+    <h3>Jira Linking & Project Context</h3>
+    <ul>
+      <li>Fix Version and Epic names now link back to Jira.</li>
+      <li>Project key is included in the roadmap response for consistent navigation.</li>
+    </ul>
+
+    <h3>Authentication Reliability</h3>
+    <ul>
+      <li>Jira 401/403 responses now trigger a sign-out flow instead of a 500.</li>
+      <li>Session store uses timezone-aware UTC timestamps.</li>
+    </ul>
+
+    <h3>Release Notes UX</h3>
+    <ul>
+      <li>Release notes list and detail pages are accessible in-app.</li>
+      <li>Navigation between versions is included for quick reference.</li>
+    </ul>
+
+    <h2 id="usage">How to Use</h2>
+    <h3>Timeline</h3>
+    <ul>
+      <li>Hover any bar to see precise start/end dates.</li>
+      <li>Select Fix Versions or Epics to open Jira links.</li>
+    </ul>
+
+    <h3>Sign-in / Sign-out</h3>
+    <ul>
+      <li>If Jira auth expires, you’ll be prompted to sign in again.</li>
+      <li>Use the header sign-out button to clear the session.</li>
+    </ul>
+
+    <h2 id="notes">Notes</h2>
+    <div class="note">
+      This release continues to build on v1 features (dashboards, rich-text panels,
+      and filters). For full details, see v1 release notes.
+    </div>
+
+    <div class="footer">Delivery Tracker – Release Notes v2</div>
+  </div>
+</body>
+</html>

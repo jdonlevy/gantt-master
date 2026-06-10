@@ -1,0 +1,28 @@
+node_modules/
+.venv/
+.env
+.env.*
+__pycache__/
+*.pyc
+*.log
+.DS_Store
+frontend/.vite/
+frontend/test-results/
+test-results/
+frontend/dist/
+frontend/tsconfig.tsbuildinfo
+awscreds.sh
+release_notes_main.html
+.claude/
+fix-versions-compact-mockup.html
+gantt-dependencies-mockup.html
+
+# Vite temp files
+frontend/vite.config.ts.timestamp-*
+
+# Root-level scratch/mockup html files
+/*.html
+# PR body drafts
+.pr-body*.md
+# Local dev runtime config (contains real Azure AD credentials)
+frontend/public/env.js
